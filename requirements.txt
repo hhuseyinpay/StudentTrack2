@@ -9,6 +9,7 @@ django-silk==3.0.1
 djangorestframework==3.8.2
 djangorestframework-jwt==1.11.0
 gprof2dot==2016.10.13
+gunicorn==19.9.0
 idna==2.7
 isort==4.3.4
 Jinja2==2.10
