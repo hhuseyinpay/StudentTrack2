@@ -25,7 +25,7 @@ SECRET_KEY = 'q!)p9&-cf_klktcfx-dsx_3o^8wbp1d$)8@wc4-v0*b37gx%97'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['test-student.herokuapp.com']
 
 INTERNAL_IPS = ('127.0.0.1',)  # debug_toolbar
 
@@ -98,7 +98,7 @@ DATABASES = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'student_database',
+        'NAME': 'postgresql-solid-86404',
         'USER': 'student_user',
         'PASSWORD': '123qweasd',
         'HOST': 'localhost',
