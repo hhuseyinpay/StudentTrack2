@@ -2,7 +2,7 @@ from .base import *
 
 DEBUG = True
 
-INSTALLED_APPS = [
+INSTALLED_APPS += [
     'silk',
     'django_extensions',
 ]
@@ -16,9 +16,9 @@ MIDDLEWARE += [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'student_database',
-        'USER': 'student_user',
-        'PASSWORD': '123qweasd',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '',
     }
