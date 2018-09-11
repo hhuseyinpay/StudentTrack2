@@ -55,7 +55,6 @@ coverage.xml
 
 # Django stuff:
 *.log
-student/settings/local_debug.py
 db.sqlite3
 
 # Flask stuff:
@@ -106,3 +105,7 @@ venv.bak/
 .mypy_cache/
 
 /manage commands.txt
+.Procfile.un~
+.idea/dataSources.local.xml
+.idea/httpRequests/
+.idea/workspace.xml
