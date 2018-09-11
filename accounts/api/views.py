@@ -2,7 +2,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, QuerySet
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from .serializer import ProfileModelSerializer, ProfileRetrieveUpdateDestroySeriazlizer, ListProfileSerializer, \
     ProfileCreateSerializer

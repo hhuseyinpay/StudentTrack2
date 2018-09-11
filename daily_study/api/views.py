@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from daily_study.models import DailyStudy, Study, Course
 from .serializer import DailyStudyModelSerializer, GroupCourseModelSerializer, DailyStudyValidateSerializer
