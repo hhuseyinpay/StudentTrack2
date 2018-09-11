@@ -25,7 +25,7 @@ SECRET_KEY = 'q!)p9&-cf_klktcfx-dsx_3o^8wbp1d$)8@wc4-v0*b37gx%97'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['test-student.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', 'test-student.herokuapp.com']
 
 INTERNAL_IPS = ('127.0.0.1',)  # debug_toolbar
 
@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'student.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, '../../db.sqlite3'),
     }
 }
 """
@@ -137,19 +137,15 @@ USE_I18N = True
 
 USE_L10N = False
 
-USE_TZ = False
+USE_TZ = False # serializer timestampe +03.00 gibi şeyler ekliyo?
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
+STATIC_ROOT = os.path.join(PROJECT_DIR, '../static')
 
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
 
 # jwt için
 REST_FRAMEWORK = {
@@ -173,11 +169,3 @@ DATE_FORMATS = '%Y-%m-%d'
 
 DATETIME_INPUT_FORMATS = '%Y-%m-%d %H:%M:%S'
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-
-#TIME_INPUT_FORMATS = '%H:%M:%S'
-#TIME_FORMAT = '%H:%M:%S'
-
-#from django.conf.locale.tr import formats as tr_formats
-
-#tr_formats.DATETIME_FORMAT = "Y M d H:M:S"
-#tr_formats.DATETIME_INPUT_FORMATS = "Y M d H:M:S"
