@@ -122,6 +122,7 @@ USE_TZ = False  # serializer timestampe +03.00 gibi şeyler ekliyo?
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 # jwt için
