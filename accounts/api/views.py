@@ -1,5 +1,3 @@
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q, QuerySet
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 

@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'rest_framework',
+    'rest_framework.authtoken',
 
     'base',
     'student',
@@ -131,16 +133,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
 }
-"""
-JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=100),
-}
-"""
 
 # gerekli olup olmadığını bilmiyorum gün formatını %d-%m-%Y yapmaya çalıştım beceremeyince böyle bıraktım :)
 DATE_INPUT_FORMATS = ['%Y-%m-%d']

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import Group
 from rest_framework import generics, viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from ..models import Syllabus, UserSyllabus
 from .serializer import SyllabusModelSerializer, UserSyllabusModelSerializer, SyllabusListSerializer
@@ -8,6 +8,7 @@ from .serializer import SyllabusModelSerializer, UserSyllabusModelSerializer, Sy
 
 class SyllabusAllListAPIView(generics.ListAPIView):
     serializer_class = SyllabusModelSerializer
+    permission_classes = (AllowAny,)
 
     def get_queryset(self):
         return Syllabus.objects.all()
@@ -15,6 +16,7 @@ class SyllabusAllListAPIView(generics.ListAPIView):
 
 class SyllabusLevelListAPIView(generics.ListAPIView):
     serializer_class = SyllabusListSerializer
+    permission_classes = (AllowAny,)
 
     def get_queryset(self):
         lvl = self.kwargs['level']
@@ -23,6 +25,7 @@ class SyllabusLevelListAPIView(generics.ListAPIView):
 
 class SyllabusLevelCourseAPIView(generics.ListAPIView):
     serializer_class = SyllabusModelSerializer
+    permission_classes = (AllowAny,)
 
     def get_queryset(self):
         lvl = self.kwargs['level']
