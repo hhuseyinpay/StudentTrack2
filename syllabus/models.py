@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-from silk.profiling.profiler import silk_profile
 
 from base.models import Course
 
