@@ -27,7 +27,7 @@ urlpatterns = [
 
     # path('', include('daily_study.urls')),
 
-    path('api/login/', views.ObtainAuthToken.as_view()),
+    path('api/login/', views.ObtainAuthToken.as_view(), name="api-login"),
     path('api/daily_study/', include('daily_study.api.urls')),
     path('api/syllabus/', include('syllabus.api.urls')),
     path('api/accounts/', include('accounts.api.urls')),

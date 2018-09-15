@@ -137,6 +137,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
+    'TEST_REQUEST_DEFAULT_FORMAT': (
+        'json',
+    )
 }
 
 # gerekli olup olmadığını bilmiyorum gün formatını %d-%m-%Y yapmaya çalıştım beceremeyince böyle bıraktım :)
