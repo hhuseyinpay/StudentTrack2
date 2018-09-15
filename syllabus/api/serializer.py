@@ -51,3 +51,9 @@ class UserSyllabusModelSerializer(serializers.ModelSerializer):
                 fields=('user', 'content')
             )
         ]
+
+
+class UserSyllabusListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserSyllabus
+        # current_user = self.context['user']

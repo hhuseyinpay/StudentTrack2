@@ -3,7 +3,8 @@ from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from ..models import Syllabus, UserSyllabus
-from .serializer import SyllabusModelSerializer, UserSyllabusModelSerializer, SyllabusListSerializer
+from .serializer import SyllabusModelSerializer, UserSyllabusModelSerializer, SyllabusListSerializer, \
+    UserSyllabusListSerializer
 
 
 class SyllabusAllListAPIView(generics.ListAPIView):
@@ -53,3 +54,18 @@ class UserSyllabusUserViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class UserSyllabusAPIView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserSyllabusModelSerializer
+
+    def get_queryset(self):
+        lvl = self.kwargs['level']
+        cr = self.kwargs['course']
+
+        return UserSyllabus.objects.filter(user=self.request.user, content__syllabus__course=cr,
+                                           content__syllabus__level=lvl)
+
+    def get_serializer_context(self):
+        return {'user': self.request.user}
