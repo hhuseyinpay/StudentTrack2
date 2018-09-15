@@ -11,17 +11,14 @@ class UserModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = [
-            'id', 'username', 'first_name', 'last_name'
-        ]
+        fields = ('id', 'username', 'first_name', 'last_name')
+        write_only_fields = ('password',)
 
 
 class ListUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = [
-            'username', 'first_name', 'last_name'
-        ]
+        fields = ('username', 'first_name', 'last_name')
 
 
 class ListProfileSerializer(serializers.ModelSerializer):
@@ -29,9 +26,7 @@ class ListProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = [
-            'id', 'user', 'is_teacher', 'is_executive', 'is_admin'
-        ]
+        fields = ('id', 'user', 'is_teacher', 'is_executive', 'is_admin')
 
 
 class ClassRoomBasicModelSerializer(serializers.ModelSerializer):
@@ -40,9 +35,7 @@ class ClassRoomBasicModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClassRoom
-        fields = [
-            'id', 'name', 'teachers', 'related_area'
-        ]
+        fields = ('id', 'name', 'teachers', 'related_area')
 
 
 class ProfileModelSerializer(serializers.ModelSerializer):
@@ -51,9 +44,7 @@ class ProfileModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = [
-            'user', 'classroom', 'is_teacher', 'is_executive', 'is_admin'
-        ]
+        fields = ('user', 'classroom', 'is_teacher', 'is_executive', 'is_admin')
 
 
 # *********************************************
@@ -64,25 +55,19 @@ class PClassSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClassRoom
-        fields = [
-            'id', 'name',
-        ]
+        fields = ('id', 'name')
 
 
 class PAreaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassRoom
-        fields = [
-            'id', 'name',
-        ]
+        fields = ('id', 'name')
 
 
 class PRegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassRoom
-        fields = [
-            'id', 'name',
-        ]
+        fields = ('id', 'name')
 
 
 class ProfileRetrieveUpdateDestroySeriazlizer(serializers.ModelSerializer):
@@ -99,8 +84,8 @@ class ProfileRetrieveUpdateDestroySeriazlizer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = (
-            'id', 'user', 'classroom', 'related_area', 'related_region', 'is_student', 'is_teacher', 'is_executive',
-            'is_admin'
+            'id', 'user', 'classroom', 'related_area', 'related_region',
+            'is_student', 'is_teacher', 'is_executive', 'is_admin'
         )
         read_only_fields = ('related_area', 'related_region', 'is_student', 'is_teacher', 'is_executive', 'is_admin',)
 
