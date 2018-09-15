@@ -52,7 +52,7 @@ class ProfileManager(models.Manager):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True, )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True, db_index=True)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True)
 
     classroom = models.ForeignKey(ClassRoom, on_delete=models.CASCADE, null=True, blank=True)
