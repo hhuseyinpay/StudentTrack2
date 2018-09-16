@@ -1,5 +1,6 @@
-from django.utils.timezone import now
+from datetime import datetime
 
+from django.utils.timezone import now
 from rest_framework import serializers
 
 from daily_study.models import DailyStudy, Study, Course
@@ -28,6 +29,14 @@ class DailyStudyModelSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'user', 'is_validated', 'validator_user', 'validate_time', 'timestamp', 'updated',)
 
     def create(self, validated_data):
+        try:
+            d = DailyStudy.objects.get(created_day=datetime.today())
+        except DailyStudy.DoesNotExist:
+            d = None
+        # bugün yeni bir dailystudy oluşturulduysa error
+        if d is not None:
+            raise serializers.ValidationError("You have created daily study today")
+
         studies = validated_data.pop('studies')
 
         # get the user from view and initial is_validated is false
