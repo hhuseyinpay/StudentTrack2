@@ -109,3 +109,4 @@ venv.bak/
 .idea/dataSources.local.xml
 .idea/httpRequests/
 .idea/workspace.xml
+/student/settings/__init__.py
