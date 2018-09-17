@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.authentication import TokenAuthentication
 from daily_study.models import DailyStudy, Study, Course
 from .serializer import DailyStudyModelSerializer, GroupCourseModelSerializer, DailyStudyValidateSerializer
 from .permissions import IsTeExAd, CanEditDailyStudy
@@ -9,7 +9,7 @@ from .permissions import IsTeExAd, CanEditDailyStudy
 
 class DSListCreateAPIView(generics.CreateAPIView):
     serializer_class = DailyStudyModelSerializer
-    # authentication_classes = [JSONWebTokenAuthentication, ]
+    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
@@ -22,7 +22,7 @@ class DSListCreateAPIView(generics.CreateAPIView):
 class DSRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated,)
-    # authentication_classes = [JSONWebTokenAuthentication, ]
+    authentication_classes = (TokenAuthentication,)
     lookup_field = 'id'
 
     def get_serializer_context(self):
@@ -35,7 +35,7 @@ class DSRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
 
 class DSIntervalListAPIView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
-    # authentication_classes = (JSONWebTokenAuthentication,)
+    authentication_classes = (TokenAuthentication,)
     serializer_class = DailyStudyModelSerializer
 
     def get_queryset(self):
@@ -60,7 +60,7 @@ class GroupCourseListAPIView(generics.ListAPIView):
 class AdminDSRetrieveUpdateAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated, CanEditDailyStudy,)
-    # authentication_classes = [JSONWebTokenAuthentication, ]
+    authentication_classes = (TokenAuthentication,)
     queryset = DailyStudy.objects.all()
     lookup_field = 'id'
 
@@ -81,8 +81,7 @@ class AdminDSValidateAPIView(generics.RetrieveUpdateAPIView):
 class AdminDSClassroomListAPIView(generics.ListAPIView):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated, IsTeExAd,)
-
-    # authentication_classes = [JSONWebTokenAuthentication, ]
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         user = self.request.user
