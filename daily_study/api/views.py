@@ -7,7 +7,7 @@ from .serializer import DailyStudyModelSerializer, GroupCourseModelSerializer, D
 from .permissions import IsTeExAd, CanEditDailyStudy
 
 
-class DSListCreateAPIView(generics.CreateAPIView):
+class DSListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = DailyStudyModelSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
