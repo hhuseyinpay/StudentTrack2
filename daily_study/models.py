@@ -9,9 +9,6 @@ from base.models import Course
 # Create your models here.
 
 
-# Group.add_to_class('courses', models.ManyToManyField(Course))
-
-
 class DailyStudyManager(models.Manager):
     def get_by_interval(self, user, begining, end):
         try:
@@ -23,7 +20,7 @@ class DailyStudyManager(models.Manager):
             "-timestamp")
 
     def get_day(self, user):
-        x = date.today() - timedelta(days=81)  # .strftime('%d-%m-%Y')  # son X günü döndürecek
+        x = date.today() - timedelta(days=7)
         return DailyStudy.objects.filter(user=user, created_day=x).order_by("-timestamp")
 
     def user_editables(self, user):
@@ -40,7 +37,6 @@ class DailyStudy(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     # onaylayan kişi
-
     is_validated = models.BooleanField(default=False)
     validate_time = models.DateTimeField(blank=True, null=True)
     validator_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="dailystudy_validator_user",
@@ -58,7 +54,6 @@ class Study(models.Model):
 
     begining = models.FloatField()
     end = models.FloatField()
-
     amount = models.FloatField()
 
     def __str__(self):
