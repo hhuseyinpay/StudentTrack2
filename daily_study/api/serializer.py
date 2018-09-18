@@ -34,8 +34,8 @@ class DailyStudyModelSerializer(serializers.ModelSerializer):
         except DailyStudy.DoesNotExist:
             d = None
         # bugün yeni bir dailystudy oluşturulduysa error
-        # if d is not None:
-        #    raise serializers.ValidationError("You have created daily study today")
+        if d is not None:
+            raise serializers.ValidationError("You have created daily study today")
 
         studies = validated_data.pop('studies')
 
