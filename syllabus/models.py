@@ -58,7 +58,7 @@ class UserSyllabus(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     validator_user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='syllabus_validator_user',
-                                          on_delete=models.CASCADE, )
+                                          on_delete=models.CASCADE, blank=True, null=True)
     status = models.BooleanField(default=False)
 
     objects = UserSyllabusManager()

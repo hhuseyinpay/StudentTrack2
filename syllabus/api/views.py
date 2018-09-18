@@ -47,7 +47,7 @@ class SyllabusLevelCourseAPIView(generics.ListAPIView):
 class UserSyllabusUserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = UserSyllabusModelSerializer
-    http_method_names = ['get', 'post', 'delete', 'head']
+    http_method_names = ['post', 'delete']
 
     def get_queryset(self):
         return UserSyllabus.objects.user(self.request.user)
@@ -57,8 +57,8 @@ class UserSyllabusUserViewSet(viewsets.ModelViewSet):
 
 
 class UserSyllabusAPIView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)
     serializer_class = UserSyllabusModelSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         lvl = self.kwargs['level']
