@@ -1,10 +1,24 @@
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.authtoken import views
+from rest_framework.authtoken.models import Token
 
-from .serializer import ProfileModelSerializer, ProfileRetrieveUpdateDestroySeriazlizer, ListProfileSerializer, \
+from .serializer import ProfileModelSerializer, ProfileRetrieveUpdateDestroySeriazlizer, \
+    ListProfileSerializer, \
     ProfileCreateSerializer
 from .permissions import IsTeExAd, CanEditProfile
 from accounts.models import Profile
+
+
+class UserLoginAPIView(views.ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'user': user.id, 'token': token.key})
 
 
 class ProfileListAPIView(generics.ListAPIView):

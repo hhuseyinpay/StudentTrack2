@@ -3,12 +3,14 @@ from rest_framework.routers import DefaultRouter
 
 from .views import ProfileListAPIView, ProfileViewSet, \
     ClassRoomProfileListAPIView, AreaProfileListAPIView, \
-    RegionProfileListAPIView, ListAllProfileAPIView, ProfileRetrieveUpdateDestroyAPIView, ProfileCreateAPIView
+    RegionProfileListAPIView, ListAllProfileAPIView, ProfileRetrieveUpdateDestroyAPIView, ProfileCreateAPIView, \
+    UserLoginAPIView
 
 router = DefaultRouter()
 router.register('profile', ProfileViewSet, 'profileviewset')
 
 urlpatterns = [
+    path('login/', UserLoginAPIView.as_view()),
     path('profile/me/', ProfileListAPIView.as_view(), name="user profile retrieve"),
 
     # path('edit/', include(router.urls), name="profile-detail"),
