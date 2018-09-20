@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from ..models import Syllabus, UserSyllabus
 from .serializer import SyllabusModelSerializer, UserSyllabusModelSerializer, SyllabusListSerializer, \
     UserSyllabusListSerializer
+from .permissions import CanEditSyllabus
 
 
 class SyllabusAllListAPIView(generics.ListAPIView):
@@ -69,3 +70,19 @@ class UserSyllabusAPIView(generics.ListAPIView):
 
     def get_serializer_context(self):
         return {'user': self.request.user}
+
+
+class AdminUserSyllabusAPIView(generics.ListAPIView):
+    serializer_class = UserSyllabusModelSerializer
+    permission_classes = (IsAuthenticated, CanEditSyllabus)
+
+    def get_queryset(self):
+        user = self.kwargs['user']
+        lvl = self.kwargs['level']
+        cr = self.kwargs['course']
+
+        return UserSyllabus.objects.filter(user=user, content__syllabus__course=cr,
+                                           content__syllabus__level=lvl)
+
+    def get_serializer_context(self):
+        return {'user': self.kwargs['user']}
