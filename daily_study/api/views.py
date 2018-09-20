@@ -97,6 +97,6 @@ class AdminDsRetrieveUserDayAPIView(generics.RetrieveAPIView):
     authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
-        user = self.kwargs['classroom']
+        user = self.kwargs['user']
         day = self.kwargs['day']
         return DailyStudy.objects.filter(user=user, created_day=day)
