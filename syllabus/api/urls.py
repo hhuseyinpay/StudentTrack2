@@ -17,5 +17,5 @@ urlpatterns = [
 
     # path('me/id-list/', UserSyllabusListCreateAPIView.as_view(), name="usersyllabus list create")
     path('admin/user/<int:user>/level/<int:level>/course/<int:course>/', AdminUSAPIView.as_view()),
-    path('admin/validate/<int:id>', AdminUSValidateAPIView.as_view())
+    path('admin/validate/<int:id>/', AdminUSValidateAPIView.as_view())
 ]
