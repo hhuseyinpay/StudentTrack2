@@ -89,3 +89,14 @@ class AdminDSClassroomListAPIView(generics.ListAPIView):
         day = self.kwargs['day']
         users = User.objects.filter(profile__classroom=classroom)
         return DailyStudy.objects.filter(user__in=users, created_day=day)
+
+
+class AdminDsRetrieveUserDayAPIView(generics.RetrieveAPIView):
+    serializer_class = DailyStudyModelSerializer
+    permission_classes = (IsAuthenticated, CanEditDailyStudy,)
+    authentication_classes = (TokenAuthentication,)
+
+    def get_queryset(self):
+        user = self.kwargs['classroom']
+        day = self.kwargs['day']
+        return DailyStudy.objects.filter(user=user, created_day=day)
