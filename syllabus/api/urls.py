@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from .views import SyllabusLevelListAPIView, SyllabusAllListAPIView, UserSyllabusUserViewSet, \
-    SyllabusLevelCourseAPIView, UserSyllabusAPIView, AdminUSAPIView, AdminUSValidateAPIView
+    SyllabusLevelCourseAPIView, UserSyllabusAPIView, AdminUSAPIView, AdminUSValidateAPIView, AdminUSNotValidatedAPIView
 
 router = DefaultRouter()
 router.register('me', UserSyllabusUserViewSet, 'UserSyllabus')
@@ -17,5 +17,6 @@ urlpatterns = [
 
     # path('me/id-list/', UserSyllabusListCreateAPIView.as_view(), name="usersyllabus list create")
     path('admin/user/<int:user>/level/<int:level>/course/<int:course>/', AdminUSAPIView.as_view()),
-    path('admin/validate/<int:id>/', AdminUSValidateAPIView.as_view())
+    path('admin/validate/<int:id>/', AdminUSValidateAPIView.as_view()),
+    path('admin/notvalidated/user/<int:user>/', AdminUSNotValidatedAPIView.as_view())
 ]

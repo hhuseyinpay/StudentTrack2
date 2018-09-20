@@ -96,3 +96,15 @@ class AdminUSValidateAPIView(generics.UpdateAPIView):
 
     def get_serializer_context(self):
         return {'user': self.request.user}
+
+
+class AdminUSNotValidatedAPIView(generics.ListAPIView):
+    serializer_class = UserSyllabusModelSerializer
+    permission_classes = (IsAuthenticated, CanEditSyllabus)
+
+    def get_queryset(self):
+        user = self.kwargs['user']
+        return UserSyllabus.objects.filter(user=user, is_validated=False)
+
+    def get_serializer_context(self):
+        return {'user': self.request.user}
