@@ -30,7 +30,7 @@ class DailyStudyModelSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         try:
-            d = DailyStudy.objects.get(created_day=datetime.today())
+            d = DailyStudy.objects.get(user=self.context['user'], created_day=datetime.today())
         except DailyStudy.DoesNotExist:
             d = None
         # bugün yeni bir dailystudy oluşturulduysa error
