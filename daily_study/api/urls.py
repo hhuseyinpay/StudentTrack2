@@ -25,7 +25,7 @@ urlpatterns = [
     path('admin/validate/<int:id>/', AdminDSValidateAPIView.as_view(), name="admin daily_study validate"),
     path('admin/edit/<int:id>/', AdminDSRetrieveUpdateAPIView.as_view(),
          name="admin daily_study retrieve update destroy"),
-    path('admin/user/<int:user_id>/day/<str:day>/', AdminDsRetrieveUserDayAPIView.as_view()),
+    path('admin/user/<int:user>/day/<str:day>/', AdminDsRetrieveUserDayAPIView.as_view()),
     path('admin/classroom/<int:classroom>/day/<str:day>/', AdminDSClassroomListAPIView.as_view()),
 
 ]
