@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
+
 from daily_study.models import DailyStudy, Study, Course
 from .serializer import DailyStudyModelSerializer, GroupCourseModelSerializer, DailyStudyValidateSerializer
 from .permissions import IsTeExAd, CanEditDailyStudy
@@ -52,6 +53,24 @@ class GroupCourseListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         group = self.request.user.profile.group
+        if group:
+            return group.courses.all()
+        return Course.objects.none()
+
+
+class UserGroupCourseListAPIView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = GroupCourseModelSerializer
+
+    def get_queryset(self):
+
+        try:
+            user = User.objects.get(id=self.kwargs['user'])
+        except User.DoesNotExist:
+            from django.http import Http404
+            raise Http404("User does not exist")
+
+        group = user.profile.group
         if group:
             return group.courses.all()
         return Course.objects.none()

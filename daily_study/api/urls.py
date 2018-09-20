@@ -4,14 +4,14 @@ from django.urls import path
 
 from .views import DSListCreateAPIView, DSRetrieveUpdateAPIView, DSIntervalListAPIView, \
     GroupCourseListAPIView, AdminDSRetrieveUpdateAPIView, AdminDSValidateAPIView, AdminDSClassroomListAPIView, \
-    AdminDsRetrieveUserDayAPIView
+    AdminDsRetrieveUserDayAPIView, UserGroupCourseListAPIView
 
 # router = DefaultRouter()
 # router.register('ceteles', CeteleViewSet, base_name="ceteles")
 
 urlpatterns = [
     path('courses/', GroupCourseListAPIView.as_view()),
-
+    path('courses/user/<int:user>/', UserGroupCourseListAPIView.as_view()),
     # api/daily_study/
     path('me/', DSListCreateAPIView.as_view(), name="user-daily_study-list-create"),
 
