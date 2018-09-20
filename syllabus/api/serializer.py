@@ -43,8 +43,8 @@ class UserSyllabusModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserSyllabus
-        fields = ('id', 'user', 'content', 'status', 'validator_user')
-        read_onyl_files = ('id', 'valdator_user', 'status')
+        fields = ('id', 'user', 'content', 'is_validated', 'validator_user')
+        read_onyl_files = ('id', 'valdator_user', 'is_validated')
         validators = [
             UniqueTogetherValidator(
                 queryset=UserSyllabus.objects.all(),
