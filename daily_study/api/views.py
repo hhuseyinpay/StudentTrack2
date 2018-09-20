@@ -95,6 +95,7 @@ class AdminDsRetrieveUserDayAPIView(generics.RetrieveAPIView):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated, CanEditDailyStudy,)
     authentication_classes = (TokenAuthentication,)
+    lookup_field = "user"
 
     def get_queryset(self):
         user = self.kwargs['user']
