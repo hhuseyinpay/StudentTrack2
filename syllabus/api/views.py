@@ -73,7 +73,7 @@ class UserSyllabusAPIView(generics.ListAPIView):
 
 
 class AdminUSAPIView(generics.ListAPIView):
-    serializer_class = AdminUserSyllabusModelSerializer
+    serializer_class = UserSyllabusModelSerializer
     permission_classes = (IsAuthenticated, CanEditSyllabus)
 
     def get_queryset(self):
@@ -99,7 +99,7 @@ class AdminUSValidateAPIView(generics.UpdateAPIView):
 
 
 class AdminUSNotValidatedAPIView(generics.ListAPIView):
-    serializer_class = UserSyllabusModelSerializer
+    serializer_class = AdminUserSyllabusModelSerializer
     permission_classes = (IsAuthenticated, CanEditSyllabus)
 
     def get_queryset(self):
