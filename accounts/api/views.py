@@ -41,7 +41,7 @@ class ListAllProfileAPIView(generics.ListAPIView):
 
 class ClassRoomProfileListAPIView(generics.ListAPIView):
     serializer_class = ListProfileSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, CanEditProfile)
 
     # authentication_classes = [JSONWebTokenAuthentication, ]
 
