@@ -53,6 +53,10 @@ class UserSyllabusModelSerializer(serializers.ModelSerializer):
         ]
 
 
+class AdminUserSyllabusModelSerializer(UserSyllabusModelSerializer):
+    content = serializers.StringRelatedField()
+
+
 class UserSyllabusListSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserSyllabus

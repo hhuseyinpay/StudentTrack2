@@ -42,7 +42,12 @@ class Content(models.Model):
     # amount = models.FloatField()
 
     def __str__(self):
-        return str(self.syllabus) + " >> " + str(self.week) + " | " + str(self.name)
+        """
+        Admin'den yeni content eklerken kolaylık sağlamak amacıyla syllabus ismini vs alıyordum
+        mobil kısımda direk content name'e ihtiyaç olduğu için sadece kendi ismini döndörüyor şuanda.
+        :return:
+        """
+        return str(self.name)  # str(self.syllabus) + " >> " + str(self.week) + " | " + str(self.name)
 
 
 class UserSyllabusManager(models.Manager):
