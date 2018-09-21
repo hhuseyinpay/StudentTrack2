@@ -17,10 +17,10 @@ class DailyStudyManager(models.Manager):
         except ValueError:
             raise ValueError("Incorrect data format, should be YYYY-MM-DD")
         return DailyStudy.objects.filter(user=user, created_day__gte=begining, created_day__lte=end).order_by(
-            "-timestamp")
+            "-created_day")
 
     def get_day(self, user):
-        x = date.today()# - timedelta(days=7)
+        x = date.today()  # - timedelta(days=7)
         return DailyStudy.objects.filter(user=user, created_day=x).order_by("-timestamp")
 
     def user_editables(self, user):

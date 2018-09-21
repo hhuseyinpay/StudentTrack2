@@ -4,7 +4,7 @@ from django.urls import path
 
 from .views import DSListCreateAPIView, DSRetrieveUpdateAPIView, DSIntervalListAPIView, \
     GroupCourseListAPIView, AdminDSRetrieveUpdateAPIView, AdminDSValidateAPIView, AdminDSClassroomListAPIView, \
-    AdminDsRetrieveUserDayAPIView, UserGroupCourseListAPIView
+    AdminDsRetrieveUserDayAPIView, UserGroupCourseListAPIView, AdminDSIntervalListAPIView
 
 # router = DefaultRouter()
 # router.register('ceteles', CeteleViewSet, base_name="ceteles")
@@ -23,9 +23,9 @@ urlpatterns = [
 
     # url('viewset/', include(router.urls)),
     path('admin/validate/<int:id>/', AdminDSValidateAPIView.as_view(), name="admin daily_study validate"),
-    path('admin/edit/<int:id>/', AdminDSRetrieveUpdateAPIView.as_view(),
-         name="admin daily_study retrieve update destroy"),
+    path('admin/edit/<int:id>/', AdminDSRetrieveUpdateAPIView.as_view(), ),
     path('admin/user/<int:user>/day/<str:day>/', AdminDsRetrieveUserDayAPIView.as_view()),
+    path('admin/user/<int:user>/begining/<str:begining>/end/<str:end>/', AdminDSIntervalListAPIView.as_view()),
     path('admin/classroom/<int:classroom>/day/<str:day>/', AdminDSClassroomListAPIView.as_view()),
 
 ]

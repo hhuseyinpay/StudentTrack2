@@ -112,7 +112,7 @@ class AdminDSClassroomListAPIView(generics.ListAPIView):
 
 class AdminDsRetrieveUserDayAPIView(generics.RetrieveAPIView):
     serializer_class = DailyStudyModelSerializer
-    permission_classes = (IsAuthenticated, CanEditDailyStudy,)
+    permission_classes = (IsAuthenticated, CanEditDailyStudy)
     authentication_classes = (TokenAuthentication,)
     lookup_field = "user"
 
@@ -120,3 +120,16 @@ class AdminDsRetrieveUserDayAPIView(generics.RetrieveAPIView):
         user = self.kwargs['user']
         day = self.kwargs['day']
         return DailyStudy.objects.filter(user=user, created_day=day)
+
+
+class AdminDSIntervalListAPIView(generics.ListAPIView):
+    serializer_class = DailyStudyModelSerializer
+    permission_classes = (IsAuthenticated, CanEditDailyStudy)
+    authentication_classes = (TokenAuthentication,)
+
+    def get_queryset(self):
+        user = self.kwargs['user']
+        begining = self.kwargs['begining']
+        end = self.kwargs['end']
+
+        return DailyStudy.objects.get_by_interval(user=user, begining=begining, end=end)
