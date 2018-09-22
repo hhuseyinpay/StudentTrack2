@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authtoken import views
 from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
 
 from .serializer import ProfileModelSerializer, ProfileRetrieveUpdateDestroySeriazlizer, \
     ListProfileSerializer, \
@@ -41,13 +42,14 @@ class ListAllProfileAPIView(generics.ListAPIView):
 
 class ClassRoomProfileListAPIView(generics.ListAPIView):
     serializer_class = ListProfileSerializer
-    permission_classes = (IsAuthenticated, CanEditProfile)
-
-    # authentication_classes = [JSONWebTokenAuthentication, ]
+    permission_classes = (IsAuthenticated, IsTeExAd)
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
+        teacher = self.request.user
         classroom = self.kwargs.get('classroom')
-        return Profile.objects.filter(classroom=classroom)
+        return Profile.objects.filter(classroom=classroom, classroom__teachers=teacher,
+                                      is_teacher=False, is_executive=False, is_admin=False)
 
 
 class AreaProfileListAPIView(generics.ListAPIView):
