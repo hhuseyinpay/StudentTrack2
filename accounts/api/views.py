@@ -177,7 +177,7 @@ class ProfileRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
 
 
 class AdminMyClassroomList(generics.ListAPIView):
-    serializer = PClassSerializer
+    serializer_class = PClassSerializer
     permission_classes = (IsAuthenticated, IsTeExAd)
     authentication_classes = (TokenAuthentication,)
 
