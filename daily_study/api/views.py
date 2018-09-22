@@ -102,6 +102,21 @@ class AdminDSValidateAPIView(generics.RetrieveUpdateAPIView):
         return {'user': self.request.user}
 
 
+class AdminDSNotvalidatedAPIView(generics.ListAPIView):
+    serializer_class = DailyStudyModelSerializer
+    permission_class = (IsAuthenticated, IsTeExAd,)
+    atuhentication_classes = (TokenAuthentication,)
+
+    def get_queryset(self):
+        try:
+            user = User.objects.get(id=self.kwargs['user'])
+        except User.DoesNotExist:
+            raise NotFound("User not found")
+        if not is_authority(self.request.user, user.profile):
+            raise PermissionDenied()
+        return DailyStudy.objects.filter(user=user, is_validated=False)
+
+
 class AdminDSClassroomListAPIView(generics.ListAPIView):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated, IsTeExAd,)
