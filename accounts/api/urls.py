@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/profile/area/<int:area>/', AreaProfileListAPIView.as_view()),
     path('admin/profile/region/<int:region>/', RegionProfileListAPIView.as_view()),
     path('admin/profile/create/', ProfileCreateAPIView.as_view()),
+
     path('admin/myclassrooms/', AdminMyClassroomList.as_view()),
     # path('area/'),
     # path('region/'),

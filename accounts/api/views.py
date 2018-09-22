@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -183,4 +185,7 @@ class AdminMyClassroomList(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return ClassRoom.objects.filter(teachers=user)
+
+        return ClassRoom.objects.filter(Q(teachers=user) |
+                                        Q(related_area__executives=user) |
+                                        Q(related_area__related_region__admins=user)).distinct()
