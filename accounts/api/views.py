@@ -5,11 +5,10 @@ from rest_framework.authtoken import views
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 
-from .serializer import ProfileModelSerializer, ProfileRetrieveUpdateDestroySeriazlizer, \
-    ListProfileSerializer, \
-    ProfileCreateSerializer
+from .serializer import ProfileModelSerializer, ProfileRetrieveUpdateDestroySeriazlizer, ListProfileSerializer, \
+    ProfileCreateSerializer, PClassSerializer
 from .permissions import IsTeExAd, CanEditProfile
-from accounts.models import Profile
+from accounts.models import Profile, ClassRoom
 
 
 class UserLoginAPIView(views.ObtainAuthToken):
@@ -75,8 +74,8 @@ class RegionProfileListAPIView(generics.ListAPIView):
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated, IsTeExAd,)
     serializer_class = ProfileRetrieveUpdateDestroySeriazlizer
+    permission_classes = (IsAuthenticated, IsTeExAd)
     lookup_field = 'id'
 
     # authentication_classes = [JSONWebTokenAuthentication, ]
@@ -152,7 +151,7 @@ class ProfileCreateAPIView(generics.CreateAPIView):
 
 class ProfileRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProfileRetrieveUpdateDestroySeriazlizer
-    permission_classes = (IsAuthenticated, CanEditProfile,)
+    permission_classes = (IsAuthenticated, CanEditProfile)
     lookup_field = 'id'
 
     def get_queryset(self):
@@ -175,3 +174,13 @@ class ProfileRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
     #             Q(classroom__related_area__related_region__executives=user)
     #         ).distinct()
     #     return None
+
+
+class AdminMyClassroomList(generics.ListAPIView):
+    serializer = PClassSerializer
+    permission_classes = (IsAuthenticated, IsTeExAd)
+    authentication_classes = (TokenAuthentication,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return ClassRoom.objects.filter(teachers=user)
