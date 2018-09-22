@@ -60,13 +60,13 @@ class PClassSerializer(serializers.ModelSerializer):
 
 class PAreaSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ClassRoom
+        model = Area
         fields = ('id', 'name')
 
 
 class PRegionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ClassRoom
+        model = Region
         fields = ('id', 'name')
 
 
