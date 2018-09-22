@@ -104,7 +104,7 @@ class AdminDSValidateAPIView(generics.RetrieveUpdateAPIView):
 
 class AdminDSNotvalidatedAPIView(generics.ListAPIView):
     serializer_class = DailyStudyModelSerializer
-    permission_class = (IsAuthenticated, IsTeExAd,)
+    permission_classes = (IsAuthenticated, IsTeExAd,)
     atuhentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
