@@ -1,17 +1,20 @@
+from django.http import Http404
 from django.contrib.auth.models import User
+
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.exceptions import PermissionDenied, NotFound
 
 from daily_study.models import DailyStudy, Study, Course
 from .serializer import DailyStudyModelSerializer, GroupCourseModelSerializer, DailyStudyValidateSerializer
-from .permissions import IsTeExAd, CanEditDailyStudy
+from .permissions import IsTeExAd, CanEditDailyStudy, is_authority
 
 
 class DSListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = DailyStudyModelSerializer
-    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         return DailyStudy.objects.get_day(self.request.user)
@@ -35,9 +38,9 @@ class DSRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
 
 
 class DSIntervalListAPIView(generics.ListAPIView):
+    serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
-    serializer_class = DailyStudyModelSerializer
 
     def get_queryset(self):
         user = self.request.user
@@ -48,8 +51,9 @@ class DSIntervalListAPIView(generics.ListAPIView):
 
 
 class GroupCourseListAPIView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)
     serializer_class = GroupCourseModelSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         group = self.request.user.profile.group
@@ -59,16 +63,16 @@ class GroupCourseListAPIView(generics.ListAPIView):
 
 
 class UserGroupCourseListAPIView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)
     serializer_class = GroupCourseModelSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
 
         try:
             user = User.objects.get(id=self.kwargs['user'])
         except User.DoesNotExist:
-            from django.http import Http404
-            raise Http404("User does not exist")
+            raise NotFound("User not found")
 
         group = user.profile.group
         if group:
@@ -90,6 +94,7 @@ class AdminDSRetrieveUpdateAPIView(generics.RetrieveUpdateDestroyAPIView):
 class AdminDSValidateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = DailyStudyValidateSerializer
     permission_classes = (IsAuthenticated, CanEditDailyStudy,)
+    authentication_classes = (TokenAuthentication,)
     queryset = DailyStudy.objects.all()
     lookup_field = 'id'
 
@@ -124,11 +129,17 @@ class AdminDsRetrieveUserDayAPIView(generics.RetrieveAPIView):
 
 class AdminDSIntervalListAPIView(generics.ListAPIView):
     serializer_class = DailyStudyModelSerializer
-    permission_classes = (IsAuthenticated, CanEditDailyStudy)
+    permission_classes = (IsAuthenticated, IsTeExAd)
     authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
-        user = self.kwargs['user']
+        try:
+            user = User.objects.get(id=self.kwargs['user'])
+        except User.DoesNotExist:
+            raise NotFound("User not found")
+        if not is_authority(self.request.user, user.profile):
+            raise PermissionDenied()
+
         begining = self.kwargs['begining']
         end = self.kwargs['end']
 
