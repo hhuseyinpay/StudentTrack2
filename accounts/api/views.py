@@ -26,8 +26,7 @@ class UserLoginAPIView(views.ObtainAuthToken):
 class ProfileListAPIView(generics.ListAPIView):
     serializer_class = ProfileModelSerializer
     permission_classes = (IsAuthenticated,)
-
-    # authentication_classes = [JSONWebTokenAuthentication, ]
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         return Profile.objects.user(self.request.user)
@@ -36,6 +35,7 @@ class ProfileListAPIView(generics.ListAPIView):
 class ListAllProfileAPIView(generics.ListAPIView):
     serializer_class = ListProfileSerializer
     permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         return Profile.objects.all()
@@ -55,9 +55,8 @@ class ClassRoomProfileListAPIView(generics.ListAPIView):
 
 class AreaProfileListAPIView(generics.ListAPIView):
     serializer_class = ListProfileSerializer
-    permission_classes = (IsAuthenticated,)
-
-    # authentication_classes = [JSONWebTokenAuthentication, ]
+    permission_classes = (IsAuthenticated, IsTeExAd)
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         area = self.kwargs.get('area')
@@ -66,9 +65,8 @@ class AreaProfileListAPIView(generics.ListAPIView):
 
 class RegionProfileListAPIView(generics.ListAPIView):
     serializer_class = ListProfileSerializer
-    permission_classes = (IsAuthenticated,)
-
-    # authentication_classes = [JSONWebTokenAuthentication, ]
+    permission_classes = (IsAuthenticated, IsTeExAd)
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         region = self.kwargs.get('region')
@@ -78,6 +76,7 @@ class RegionProfileListAPIView(generics.ListAPIView):
 class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileRetrieveUpdateDestroySeriazlizer
     permission_classes = (IsAuthenticated, IsTeExAd)
+    authentication_classes = (TokenAuthentication,)
     lookup_field = 'id'
 
     # authentication_classes = [JSONWebTokenAuthentication, ]
@@ -144,8 +143,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class ProfileCreateAPIView(generics.CreateAPIView):
     serializer_class = ProfileCreateSerializer
     permission_classes = (IsAuthenticated, IsTeExAd)
-
-    # authentication_classes = [JSONWebTokenAuthentication, ]
+    authentication_classes = (TokenAuthentication,)
 
     def get_serializer_context(self):
         return {'user': self.request.user}
