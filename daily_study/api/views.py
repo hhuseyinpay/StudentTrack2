@@ -114,7 +114,7 @@ class AdminDSNotvalidatedAPIView(generics.ListAPIView):
             raise NotFound("User not found")
         if not is_authority(self.request.user, user.profile):
             raise PermissionDenied()
-        return DailyStudy.objects.filter(user=user, is_validated=False)
+        return DailyStudy.objects.filter(user=user, is_validated=False).order_by("-created_day")
 
 
 class AdminDSClassroomListAPIView(generics.ListAPIView):
