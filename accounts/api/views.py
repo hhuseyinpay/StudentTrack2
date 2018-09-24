@@ -1,16 +1,15 @@
 from django.db.models import Q
-
 from rest_framework import generics, viewsets
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken import views
 from rest_framework.authtoken.models import Token
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
-from .serializer import ProfileModelSerializer, ProfileRetrieveUpdateDestroySeriazlizer, ListProfileSerializer, \
-    ProfileCreateSerializer, PClassSerializer
+from accounts.models import Profile, ClassRoom, Groups
 from .permissions import IsTeExAd, CanEditProfile
-from accounts.models import Profile, ClassRoom
+from .serializer import ProfileModelSerializer, ProfileRetrieveUpdateDestroySeriazlizer, ListProfileSerializer, \
+    ProfileCreateSerializer, PClassSerializer, PGroupSerializer
 
 
 class UserLoginAPIView(views.ObtainAuthToken):
@@ -187,3 +186,10 @@ class AdminMyClassroomList(generics.ListAPIView):
         return ClassRoom.objects.filter(Q(teachers=user) |
                                         Q(related_area__executives=user) |
                                         Q(related_area__related_region__admins=user)).distinct()
+
+
+class AdminGroupList(generics.ListAPIView):
+    serializer_class = PGroupSerializer
+    # permission_classes = (IsAuthenticated, IsTeExAd)
+    # authentication_classes = (TokenAuthentication,)
+    queryset = Groups.objects.all()

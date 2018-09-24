@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from .views import ProfileListAPIView, ProfileViewSet, \
     ClassRoomProfileListAPIView, AreaProfileListAPIView, \
     RegionProfileListAPIView, ListAllProfileAPIView, ProfileRetrieveUpdateDestroyAPIView, ProfileCreateAPIView, \
-    UserLoginAPIView, AdminMyClassroomList
+    UserLoginAPIView, AdminMyClassroomList, AdminGroupList
 
 router = DefaultRouter()
 router.register('profile', ProfileViewSet, 'profileviewset')
@@ -24,8 +24,7 @@ urlpatterns = [
     path('admin/profile/create/', ProfileCreateAPIView.as_view()),
 
     path('admin/myclassrooms/', AdminMyClassroomList.as_view()),
-    # path('area/'),
-    # path('region/'),
+    path('admin/groups/', AdminGroupList.as_view())
 
     # path('create/', ProfileCreateAPIView.as_view(), name="user profile create"),
     # path('edit/<int:id>/', ProfileRetrieveUpdateDestroyAPIView.as_view(), name="user profile retrieve-update-delete"),
