@@ -41,7 +41,7 @@ class ListAllProfileAPIView(generics.ListAPIView):
 
 
 class ClassRoomProfileListAPIView(generics.ListAPIView):
-    serializer_class = ListProfileSerializer
+    serializer_class = ProfileRetrieveUpdateDestroySeriazlizer
     permission_classes = (IsAuthenticated, IsTeExAd)
     authentication_classes = (TokenAuthentication,)
 
