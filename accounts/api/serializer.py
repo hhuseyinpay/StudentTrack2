@@ -1,17 +1,16 @@
 from django.db.models import Q
 from rest_framework import serializers
 
-from accounts.models import User, Profile, Region, Area, ClassRoom
+from accounts.models import User, Profile, Groups, Region, Area, ClassRoom
 
 
 class UserModelSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
     first_name = serializers.CharField(max_length=30, required=True)
     last_name = serializers.CharField(max_length=30, required=True)
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name')
+        fields = ('id', 'username', 'password', 'first_name', 'last_name')
         write_only_fields = ('password',)
 
 
@@ -70,21 +69,24 @@ class PRegionSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 
+class PGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Groups
+        fields = ('id', 'name', 'description')
+
+
 class ProfileRetrieveUpdateDestroySeriazlizer(serializers.ModelSerializer):
     user = UserModelSerializer()
     classroom = PClassSerializer()  # CRPrimaryKeyRelatedField()
     # related_area = PAreaSerializer(read_only=True)  # serializers.StringRelatedField(read_only=True)
     related_region = PRegionSerializer(read_only=True)  # serializers.StringRelatedField(read_only=True)
 
-    # is_student = serializers.BooleanField(required=False)
-    # is_teacher = serializers.BooleanField(required=False)
-    # is_executive = serializers.BooleanField(required=False)
-    # is_admin = serializers.BooleanField(required=False)
+    group = PGroupSerializer()
 
     class Meta:
         model = Profile
         fields = (
-            'id', 'user', 'classroom', 'related_area', 'related_region',
+            'id', 'user', 'group', 'classroom', 'related_area', 'related_region',
             'is_student', 'is_teacher', 'is_executive', 'is_admin'
         )
         read_only_fields = ('related_area', 'related_region', 'is_student', 'is_teacher', 'is_executive', 'is_admin',)
@@ -94,11 +96,14 @@ class ProfileRetrieveUpdateDestroySeriazlizer(serializers.ModelSerializer):
         user = User.objects.create(**u)  # new user create
         current_user = self.context['user']
 
+        group = self.validated_data['group']
+
         classroom = validated_data['classroom']
         area = classroom.related_area
         region = area.related_region
 
-        pr = Profile(user=user, classroom=classroom, related_area=area, related_region=region, created_by=current_user)
+        pr = Profile(user=user, group=group, classroom=classroom, related_area=area, related_region=region,
+                     created_by=current_user)
 
         if current_user.profile.is_executive:
             pr.is_teacher = validated_data.get('is_teacher', False)
@@ -160,3 +165,4 @@ class CRPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 
 class ProfileCreateSerializer(ProfileRetrieveUpdateDestroySeriazlizer):
     classroom = CRPrimaryKeyRelatedField()
+    group = serializers.PrimaryKeyRelatedField(queryset=Groups.objects.all())
