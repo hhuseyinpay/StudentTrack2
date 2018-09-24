@@ -23,7 +23,7 @@ class UserLoginAPIView(views.ObtainAuthToken):
 
 
 class ProfileListAPIView(generics.ListAPIView):
-    serializer_class = ProfileModelSerializer
+    serializer_class = ProfileRetrieveUpdateDestroySeriazlizer
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 

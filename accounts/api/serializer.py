@@ -7,11 +7,11 @@ from accounts.models import User, Profile, Groups, Region, Area, ClassRoom
 class UserModelSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=30, required=True)
     last_name = serializers.CharField(max_length=30, required=True)
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
         fields = ('id', 'username', 'password', 'first_name', 'last_name')
-        write_only_fields = ('password',)
 
 
 class ListUserSerializer(serializers.ModelSerializer):
@@ -78,7 +78,7 @@ class PGroupSerializer(serializers.ModelSerializer):
 class ProfileRetrieveUpdateDestroySeriazlizer(serializers.ModelSerializer):
     user = UserModelSerializer()
     classroom = PClassSerializer()  # CRPrimaryKeyRelatedField()
-    # related_area = PAreaSerializer(read_only=True)  # serializers.StringRelatedField(read_only=True)
+    related_area = PAreaSerializer(read_only=True)  # serializers.StringRelatedField(read_only=True)
     related_region = PRegionSerializer(read_only=True)  # serializers.StringRelatedField(read_only=True)
 
     group = PGroupSerializer()
@@ -89,7 +89,7 @@ class ProfileRetrieveUpdateDestroySeriazlizer(serializers.ModelSerializer):
             'id', 'user', 'group', 'classroom', 'related_area', 'related_region',
             'is_student', 'is_teacher', 'is_executive', 'is_admin'
         )
-        read_only_fields = ('related_area', 'related_region', 'is_student', 'is_teacher', 'is_executive', 'is_admin',)
+        read_only_fields = ('is_student', 'is_teacher', 'is_executive', 'is_admin',)
 
     def create(self, validated_data):
         u = validated_data['user']
