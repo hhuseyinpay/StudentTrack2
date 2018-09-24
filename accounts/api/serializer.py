@@ -49,9 +49,6 @@ class ProfileModelSerializer(serializers.ModelSerializer):
 # *********************************************
 
 class PClassSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=True)
-    name = serializers.CharField(required=False, read_only=True)
-
     class Meta:
         model = ClassRoom
         fields = ('id', 'name')
