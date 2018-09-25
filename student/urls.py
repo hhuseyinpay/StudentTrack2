@@ -31,7 +31,8 @@ urlpatterns = [
     path('api/daily_study/', include('daily_study.api.urls')),
     path('api/syllabus/', include('syllabus.api.urls')),
     path('api/accounts/', include('accounts.api.urls')),
-    path('reports/', include('reports.urls'))
+    path('reports/', include('reports.urls')),
+    path('api/reports/', include('reports.api.urls'))
 ]
 
 if settings.DEBUG:

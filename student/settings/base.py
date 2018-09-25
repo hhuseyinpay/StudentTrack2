@@ -152,3 +152,5 @@ DATE_FORMATS = '%Y-%m-%d'
 
 DATETIME_INPUT_FORMATS = '%Y-%m-%d %H:%M:%S'
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+
+REPORT_DAILYSTUDY_DIRECTORY = MEDIA_ROOT + '/reports/excel/daily_study/'
