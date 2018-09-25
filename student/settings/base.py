@@ -128,6 +128,9 @@ USE_TZ = False  # serializer timestampe +03.00 gibi şeyler ekliyo?
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
 # jwt için
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
