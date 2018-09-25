@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'accounts',
     'syllabus',
     'daily_study',
+    'reports'
 ]
 
 MIDDLEWARE = [
