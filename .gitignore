@@ -110,11 +110,9 @@ venv.bak/
 .idea/httpRequests/
 .idea/workspace.xml
 /student/settings/__init__.py
-/media/reports/template/daily_study_mountly_universite.xlsx
-/media/reports/template/daily_study_mountly_ortaokul.xlsx
-/media/reports/excel/daily_study/uni_test.xlsx
-/media/reports/template/daily_study_mountly_lise.xlsx
-media/reports/excel/
+
 media/reports/template/daily_study_mountly_lise.xlsx
 media/reports/template/daily_study_mountly_ortaokul.xlsx
 media/reports/template/daily_study_mountly_universite.xlsx
+media/reports/excel/daily_study/uni_test.xlsx
+
