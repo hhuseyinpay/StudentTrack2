@@ -116,15 +116,23 @@ class ProfileRetrieveUpdateDestroySeriazlizer(serializers.ModelSerializer):
         return pr
 
     def update(self, instance, validated_data):
+        """
+        user için ayrı admin için ayrı serializer oluşturulmalı.
+        """
         current_user = self.context['user']
-
         if current_user.profile.is_executive:
             instance.is_teacher = validated_data.get('is_teacher', False)
         elif current_user.profile.is_admin:
             instance.is_teacher = validated_data.get('is_teacher', False)
             instance.is_executive = validated_data.get('is_executive', False)
+
         if instance.is_teacher or instance.is_executive or instance.is_admin:
             instance.is_student = False
+
+        if current_user.profile.is_teacher or current_user.profile.is_executive or current_user.profile.is_admin:
+            group = validated_data.get('group', instance.group)
+            if group:
+                instance.group = group
 
         c = validated_data.get('classroom', None)  # if classroom change
         if c:
