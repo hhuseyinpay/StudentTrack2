@@ -117,7 +117,7 @@ class ProfileRetrieveUpdateDestroySeriazlizer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        user için ayrı admin için ayrı serializer oluşturulmalı.
+        user için ayrı admin için ayrı serializer oluşturulmalı. şuanda spagetti oldu kod :(
         """
         current_user = self.context['user']
         if current_user.profile.is_executive:
@@ -140,12 +140,14 @@ class ProfileRetrieveUpdateDestroySeriazlizer(serializers.ModelSerializer):
             instance.classroom = c
             instance.related_area = c.related_area
             instance.related_region = c.related_area.related_region
-            instance.save()
 
+        instance.save()
         validated_user = validated_data.get('user')
         if validated_user:
             u = User.objects.get(profile=instance)
             u.username = validated_user.get('username', u.username)
+            u.password = validated_user.get('password', u.password)
+
             u.first_name = validated_user.get('first_name', u.first_name)
             u.last_name = validated_user.get('last_name', u.last_name)
             u.save()
