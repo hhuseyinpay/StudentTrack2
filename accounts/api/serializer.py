@@ -208,10 +208,11 @@ class AdminProfileModelSerializer(serializers.ModelSerializer):
         u = validated_data['user']
         password = u.pop('password')
 
-        user = User.objects.create(**u)  # new user create
+        user = User(**u)  # new user create
         user.set_password(password)
+        user.save()
 
-        current_user = self.context['user']
+        current_user = self.context['current_user']
 
         pr = Profile(user=user, created_by=current_user)
 
@@ -219,8 +220,8 @@ class AdminProfileModelSerializer(serializers.ModelSerializer):
 
         classroom = validated_data['classroom']
         pr.classroom = classroom
-        pr.area = classroom.related_area
-        pr.region = classroom.related_area.related_region
+        pr.related_area = classroom.related_area
+        pr.related_region = classroom.related_area.related_region
 
         pr.is_student = validated_data.get('is_student', True)  # In default all profiles are student
         pr.is_teacher = validated_data.get('is_teacher', False)

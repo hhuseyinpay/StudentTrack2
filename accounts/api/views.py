@@ -217,7 +217,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
 
     def create(self, request, *args, **kwargs):
-        serializer = AdminProfileCreateSerializer(data=request.data)
+        serializer = AdminProfileCreateSerializer(data=request.data, context={'current_user': self.request.user})
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         current_user = request.user
