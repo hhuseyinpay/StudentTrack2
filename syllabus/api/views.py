@@ -1,10 +1,11 @@
 from django.contrib.auth.models import Group
 from rest_framework import generics, viewsets
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from ..models import Syllabus, UserSyllabus
 from .serializer import SyllabusModelSerializer, UserSyllabusModelSerializer, SyllabusListSerializer, \
-    UserSyllabusListSerializer, UserSyllabusValidateSerializer, AdminUserSyllabusModelSerializer
+    UserSyllabusValidateSerializer, UserSyllabusNotValidatedSerializer, AdminUserSyllabusModelSerializer
 from .permissions import CanEditSyllabus
 
 
@@ -46,8 +47,9 @@ class SyllabusLevelCourseAPIView(generics.ListAPIView):
 
 
 class UserSyllabusUserViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
     serializer_class = UserSyllabusModelSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
     http_method_names = ['post', 'delete']
 
     def get_queryset(self):
@@ -60,6 +62,7 @@ class UserSyllabusUserViewSet(viewsets.ModelViewSet):
 class UserSyllabusAPIView(generics.ListAPIView):
     serializer_class = UserSyllabusModelSerializer
     permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         lvl = self.kwargs['level']
@@ -72,9 +75,19 @@ class UserSyllabusAPIView(generics.ListAPIView):
         return {'user': self.request.user}
 
 
+class UserSyllabusNotValidatedAPIView(generics.ListAPIView):
+    serializer_class = UserSyllabusNotValidatedSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
+    def get_queryset(self):
+        return UserSyllabus.objects.filter(user=self.request.user, is_validated=False)
+
+
 class AdminUSAPIView(generics.ListAPIView):
     serializer_class = UserSyllabusModelSerializer
     permission_classes = (IsAuthenticated, CanEditSyllabus)
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         user = self.kwargs['user']
@@ -91,6 +104,7 @@ class AdminUSAPIView(generics.ListAPIView):
 class AdminUSValidateAPIView(generics.UpdateAPIView):
     serializer_class = UserSyllabusValidateSerializer
     permission_classes = (IsAuthenticated, CanEditSyllabus)
+    authentication_classes = (TokenAuthentication,)
     queryset = UserSyllabus.objects.all()
     lookup_field = 'id'
 
@@ -101,6 +115,7 @@ class AdminUSValidateAPIView(generics.UpdateAPIView):
 class AdminUSNotValidatedAPIView(generics.ListAPIView):
     serializer_class = AdminUserSyllabusModelSerializer
     permission_classes = (IsAuthenticated, CanEditSyllabus)
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         user = self.kwargs['user']

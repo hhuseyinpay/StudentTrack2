@@ -57,10 +57,10 @@ class AdminUserSyllabusModelSerializer(UserSyllabusModelSerializer):
     content = serializers.StringRelatedField()
 
 
-class UserSyllabusListSerializer(serializers.ModelSerializer):
+class UserSyllabusNotValidatedSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserSyllabus
-        # current_user = self.context['user']
+        fields = ('id',)
 
 
 class UserSyllabusValidateSerializer(serializers.ModelSerializer):
