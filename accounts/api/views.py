@@ -82,6 +82,9 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.
     def get_queryset(self):
         return Profile.objects.user(self.request.user)
 
+    def get_object(self):
+        return Profile.objects.user(self.request.user)
+
 
 class OLD_ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileRetrieveUpdateDestroySeriazlizer
