@@ -1,20 +1,21 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from .views import ProfileListAPIView, ProfileViewSet, \
     ClassRoomProfileListAPIView, AreaProfileListAPIView, \
     RegionProfileListAPIView, ListAllProfileAPIView, ProfileRetrieveUpdateDestroyAPIView, ProfileCreateAPIView, \
-    UserLoginAPIView, AdminMyClassroomList, AdminGroupList
+    UserLoginAPIView, AdminMyClassroomList, AdminGroupList, ProfileEditAPIView
 
 router = DefaultRouter()
-router.register('profile', ProfileViewSet, 'profileviewset')
+router.register('', ProfileViewSet, 'profileviewset')
 
 urlpatterns = [
+    path('profile/', include(router.urls)),
     path('login/', UserLoginAPIView.as_view()),
-    path('profile/me/', ProfileListAPIView.as_view(), name="user profile retrieve"),
+    # path('profile/me', ProfileListAPIView.as_view(), name="user profile retrieve"),
 
     # path('edit/', include(router.urls), name="profile-detail"),
-    path('profile/edit/<int:id>/', ProfileRetrieveUpdateDestroyAPIView.as_view()),
+    # path('profile/edit/<int:id>/', ProfileRetrieveUpdateDestroyAPIView.as_view()),
 
     path('profile/all/', ListAllProfileAPIView.as_view()),
 
@@ -22,6 +23,7 @@ urlpatterns = [
     path('admin/profile/area/<int:area>/', AreaProfileListAPIView.as_view()),
     path('admin/profile/region/<int:region>/', RegionProfileListAPIView.as_view()),
     path('admin/profile/create/', ProfileCreateAPIView.as_view()),
+    path('admin/profile/edit/', ProfileEditAPIView.as_view()),
 
     path('admin/myclassrooms/', AdminMyClassroomList.as_view()),
     path('admin/groups/', AdminGroupList.as_view())

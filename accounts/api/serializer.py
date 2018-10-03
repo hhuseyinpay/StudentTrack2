@@ -5,8 +5,9 @@ from accounts.models import User, Profile, Groups, Region, Area, ClassRoom
 
 
 class UserModelSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField(max_length=30, required=True)
-    last_name = serializers.CharField(max_length=30, required=True)
+    username = serializers.CharField(max_length=30)
+    first_name = serializers.CharField(max_length=50)
+    last_name = serializers.CharField(max_length=30)
     password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -26,24 +27,6 @@ class ListProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ('id', 'user', 'is_teacher', 'is_executive', 'is_admin')
-
-
-class ClassRoomBasicModelSerializer(serializers.ModelSerializer):
-    teachers = serializers.StringRelatedField(many=True)
-    related_area = serializers.StringRelatedField()
-
-    class Meta:
-        model = ClassRoom
-        fields = ('id', 'name', 'teachers', 'related_area')
-
-
-class ProfileModelSerializer(serializers.ModelSerializer):
-    user = UserModelSerializer()
-    classroom = ClassRoomBasicModelSerializer()
-
-    class Meta:
-        model = Profile
-        fields = ('id', 'user', 'classroom', 'is_teacher', 'is_executive', 'is_admin')
 
 
 # *********************************************
@@ -173,3 +156,35 @@ class CRPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 class ProfileCreateSerializer(ProfileRetrieveUpdateDestroySeriazlizer):
     classroom = CRPrimaryKeyRelatedField()
     group = serializers.PrimaryKeyRelatedField(queryset=Groups.objects.all())
+
+
+class ProfileModelSerializer(serializers.ModelSerializer):
+    user = UserModelSerializer()
+    classroom = PClassSerializer(read_only=True)
+    related_area = PAreaSerializer(read_only=True)
+    related_region = PRegionSerializer(read_only=True)
+
+    group = PGroupSerializer(read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = (
+            'id', 'user', 'group', 'classroom', 'related_area', 'related_region',
+            'is_student', 'is_teacher', 'is_executive', 'is_admin'
+        )
+        read_only_fields = ('is_student', 'is_teacher', 'is_executive', 'is_admin',)
+
+    def update(self, instance, validated_data):
+        validated_user = validated_data.get('user')
+        if validated_user:
+            u = User.objects.get(profile=instance)
+            u.username = validated_user.get('username', u.username)
+            u.password = validated_user.get('password', u.password)
+
+            u.first_name = validated_user.get('first_name', u.first_name)
+            u.last_name = validated_user.get('last_name', u.last_name)
+            u.save()
+
+        instance.save()
+        return instance
+

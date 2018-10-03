@@ -1,5 +1,5 @@
 from django.db.models import Q
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken import views
 from rest_framework.authtoken.models import Token
@@ -72,7 +72,17 @@ class RegionProfileListAPIView(generics.ListAPIView):
         return Profile.objects.filter(related_region=region)
 
 
-class ProfileViewSet(viewsets.ModelViewSet):
+class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin,
+                     viewsets.GenericViewSet):
+    serializer_class = ProfileModelSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
+    def get_queryset(self):
+        return Profile.objects.user(self.request.user)
+
+
+class OLD_ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileRetrieveUpdateDestroySeriazlizer
     permission_classes = (IsAuthenticated, IsTeExAd)
     authentication_classes = (TokenAuthentication,)
