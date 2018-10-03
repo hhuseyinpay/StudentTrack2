@@ -58,9 +58,11 @@ class AdminUserSyllabusModelSerializer(UserSyllabusModelSerializer):
 
 
 class UserSyllabusNotValidatedSerializer(serializers.ModelSerializer):
+    content = serializers.PrimaryKeyRelatedField(queryset=Content.objects.all())
+
     class Meta:
         model = UserSyllabus
-        fields = ('id',)
+        fields = ('content',)
 
 
 class UserSyllabusValidateSerializer(serializers.ModelSerializer):
