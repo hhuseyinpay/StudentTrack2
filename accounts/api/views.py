@@ -230,7 +230,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
 
             if data.get('is_teacher', False) or data.get('is_executive', False) or data.get('is_admin', False):
                 error_respons['authority'] = "You cannot create a higher authority."
-            # print(ClassRoom.objects.filter(teachers=current_user, id=data['classroom'].id))
+
             if data['classroom'] not in ClassRoom.objects.filter(teachers=current_user):
                 error_respons['classroom'] = "You cannot assign classroom that you are not teacher"
 
@@ -258,4 +258,5 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         if error_respons:
             return Response({'error': error_respons}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'status': "ups"})
+        serializer.save()
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
