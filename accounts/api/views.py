@@ -83,7 +83,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.
         return Profile.objects.user(self.request.user)
 
     def get_object(self):
-        return Profile.objects.user(self.request.user)
+        return Profile.objects.get(user=self.request.user)
 
 
 class OLD_ProfileViewSet(viewsets.ModelViewSet):
