@@ -16,7 +16,7 @@ urlpatterns = [
     path('level/<int:level>/course/<int:course>/', SyllabusLevelCourseAPIView.as_view()),
     path('user/me/level/<int:level>/course/<int:course>/', UserSyllabusAPIView.as_view()),
 
-    path('me/notvalidated/', UserSyllabusNotValidatedAPIView.as_view()),
+    path('user/me/notvalidated/', UserSyllabusNotValidatedAPIView.as_view()),
 
     path('admin/user/<int:user>/level/<int:level>/course/<int:course>/', AdminUSAPIView.as_view()),
     path('admin/validate/<int:id>/', AdminUSValidateAPIView.as_view()),
