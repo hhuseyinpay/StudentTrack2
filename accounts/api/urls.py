@@ -7,7 +7,7 @@ from .views import ProfileListAPIView, ProfileViewSet, \
     UserLoginAPIView, AdminMyClassroomList, AdminGroupList, AdminProfileViewSet
 
 user_router = DefaultRouter()
-user_router.register('', ProfileViewSet, 'profileviewset')
+user_router.register('user', ProfileViewSet, 'profileviewset')
 
 admin_router = DefaultRouter()
 admin_router.register('profile', AdminProfileViewSet, 'admin_profileviewset')
