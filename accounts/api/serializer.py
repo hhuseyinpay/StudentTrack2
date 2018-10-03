@@ -188,3 +188,77 @@ class ProfileModelSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
+class AdminProfileModelSerializer(serializers.ModelSerializer):
+    user = UserModelSerializer()
+    classroom = PClassSerializer()
+    related_area = PAreaSerializer(read_only=True)
+    related_region = PRegionSerializer(read_only=True)
+
+    group = PGroupSerializer(read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = (
+            'id', 'user', 'group', 'classroom', 'related_area', 'related_region',
+            'is_student', 'is_teacher', 'is_executive', 'is_admin'
+        )
+
+    def create(self, validated_data):
+        u = validated_data['user']
+        password = u.pop('password')
+
+        user = User.objects.create(**u)  # new user create
+        user.set_password(password)
+
+        current_user = self.context['user']
+
+        pr = Profile(user=user, created_by=current_user)
+
+        pr.group = self.validated_data['group']
+
+        classroom = validated_data['classroom']
+        pr.classroom = classroom
+        pr.area = classroom.related_area
+        pr.region = classroom.related_area.related_region
+
+        pr.is_student = validated_data.get('is_student', True)  # In default all profiles are student
+        pr.is_teacher = validated_data.get('is_teacher', False)
+        pr.is_executive = validated_data.get('is_executive', False)
+        pr.is_admin = validated_data.get('is_admin', False)
+
+        pr.save()
+        return pr
+
+    def update(self, instance, validated_data):
+        instance.is_student = validated_data.get('is_student', instance.is_student)
+        instance.is_teacher = validated_data.get('is_teacher', instance.is_teacher)
+        instance.is_executive = validated_data.get('is_executive', instance.is_executive)
+        instance.is_admin = validated_data.get('is_admin', instance.admin)
+
+        instance.group = validated_data.get('group', instance.group)
+
+        c = validated_data.get('classroom', None)  # if classroom change
+        if c:
+            c = ClassRoom.objects.get(id=c['id'])
+            instance.classroom = c
+            instance.related_area = c.related_area
+            instance.related_region = c.related_area.related_region
+
+        instance.save()
+        validated_user = validated_data.get('user')
+        if validated_user:
+            u = User.objects.get(profile=instance)
+            u.username = validated_user.get('username', u.username)
+            u.password = validated_user.get('password', u.password)
+
+            u.first_name = validated_user.get('first_name', u.first_name)
+            u.last_name = validated_user.get('last_name', u.last_name)
+            u.save()
+
+        return instance
+
+
+class AdminProfileCreateSerializer(AdminProfileModelSerializer):
+    classroom = serializers.PrimaryKeyRelatedField(queryset=ClassRoom.objects.all())
+    group = serializers.PrimaryKeyRelatedField(queryset=Groups.objects.all())

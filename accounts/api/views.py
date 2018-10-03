@@ -1,5 +1,5 @@
 from django.db.models import Q
-from rest_framework import generics, viewsets, mixins
+from rest_framework import generics, viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken import views
 from rest_framework.authtoken.models import Token
@@ -9,7 +9,8 @@ from rest_framework.response import Response
 from accounts.models import Profile, ClassRoom, Groups
 from .permissions import IsTeExAd, CanEditProfile
 from .serializer import ProfileModelSerializer, ProfileRetrieveUpdateDestroySeriazlizer, ListProfileSerializer, \
-    ProfileCreateSerializer, PClassSerializer, PGroupSerializer
+    ProfileCreateSerializer, PClassSerializer, PGroupSerializer, AdminProfileModelSerializer, \
+    AdminProfileCreateSerializer
 
 
 class UserLoginAPIView(views.ObtainAuthToken):
@@ -203,3 +204,55 @@ class AdminGroupList(generics.ListAPIView):
     # permission_classes = (IsAuthenticated, IsTeExAd)
     # authentication_classes = (TokenAuthentication,)
     queryset = Groups.objects.all()
+
+
+class AdminProfileViewSet(viewsets.ModelViewSet):
+    serializer_class = AdminProfileModelSerializer
+    permission_classes = (IsAuthenticated, IsTeExAd)
+    authentication_classes = (TokenAuthentication,)
+
+    queryset = Profile.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = AdminProfileCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        current_user = request.user
+        current_profile = current_user.profile  # currunt profile
+        error_respons = {}
+
+        if current_profile.is_teacher:  # and not current_profile.is_executive:
+            if not data.get('is_student', False):
+                error_respons['is_student'] = "You can only create a student."
+
+            if data.get('is_teacher', False) or data.get('is_executive', False) or data.get('is_admin', False):
+                error_respons['authority'] = "You cannot create a higher authority."
+            # print(ClassRoom.objects.filter(teachers=current_user, id=data['classroom'].id))
+            if data['classroom'] not in ClassRoom.objects.filter(teachers=current_user):
+                error_respons['classroom'] = "You cannot assign classroom that you are not teacher"
+
+        elif current_profile.is_executive:
+            if data.get('is_student', False) and data.get('is_teacher', False):
+                error_respons['is_student-is_teacher'] = "The profile cannot be student and teacher in the same time."
+
+            if data.get('is_executive', False) or data.get('is_admin', False):
+                error_respons['authority'] = "You cannot create a higher authority."
+
+            if data['classroom'] not in ClassRoom.objects.filter(related_area__executives=current_user):
+                error_respons['classroom'] = "You cannot assign classroom that you are not executive"
+
+        elif current_profile.is_executive:
+            if data.get('is_student', False):
+                if data.get('is_teacher', False) or data.get('is_executive', False):
+                    error_respons['is_*'] = "The profile cannot be student and (teacher or executive) in the same time."
+
+            if data.get('is_admin', False):
+                error_respons['authority'] = "You cannot create a higher authority."
+
+            if data['classroom'] not in ClassRoom.objects.filter(related_area__related_region__admins=current_user):
+                error_respons['classroom'] = "You cannot assign classroom that you are not executive"
+
+        if error_respons:
+            return Response({'error': error_respons}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'status': "ups"})
