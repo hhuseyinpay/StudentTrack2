@@ -62,7 +62,7 @@ class UserSyllabusNotValidatedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserSyllabus
-        fields = ('content',)
+        fields = ('id', 'content',)
 
 
 class UserSyllabusValidateSerializer(serializers.ModelSerializer):
