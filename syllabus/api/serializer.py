@@ -54,15 +54,15 @@ class UserSyllabusModelSerializer(serializers.ModelSerializer):
 
 
 class AdminUserSyllabusModelSerializer(UserSyllabusModelSerializer):
-    content = serializers.StringRelatedField()
+    content = ContentModelSerializer()
 
 
 class UserSyllabusNotValidatedSerializer(serializers.ModelSerializer):
-    # content = serializers.PrimaryKeyRelatedField(queryset=Content.objects.all())
+    content = ContentModelSerializer()
 
     class Meta:
         model = UserSyllabus
-        fields = ('id',)  # 'content',)
+        fields = ('id', 'user', 'content', 'is_validated', 'validator_user')
 
 
 class UserSyllabusValidateSerializer(serializers.ModelSerializer):
