@@ -179,7 +179,8 @@ class ProfileModelSerializer(serializers.ModelSerializer):
         if validated_user:
             u = User.objects.get(profile=instance)
             u.username = validated_user.get('username', u.username)
-            u.password = validated_user.get('password', u.password)
+            if validated_user.get('password', None):
+                u.set_password(validated_user.get('password'))
 
             u.first_name = validated_user.get('first_name', u.first_name)
             u.last_name = validated_user.get('last_name', u.last_name)
