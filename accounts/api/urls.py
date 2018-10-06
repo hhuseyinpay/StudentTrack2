@@ -10,7 +10,7 @@ user_router = DefaultRouter()
 user_router.register('user', ProfileViewSet, 'profileviewset')
 
 admin_router = DefaultRouter()
-admin_router.register('profile', AdminProfileViewSet, 'admin_profileviewset')
+admin_router.register('user', AdminProfileViewSet, 'admin_profileviewset')
 
 urlpatterns = [
     path('profile/', include(user_router.urls)),
@@ -22,7 +22,7 @@ urlpatterns = [
 
     path('profile/all/', ListAllProfileAPIView.as_view()),
 
-    path('admin/', include(admin_router.urls)),
+    path('admin/profile/', include(admin_router.urls)),
     path('admin/profile/classroom/<int:classroom>/', ClassRoomProfileListAPIView.as_view()),
     path('admin/profile/area/<int:area>/', AreaProfileListAPIView.as_view()),
     path('admin/profile/region/<int:region>/', RegionProfileListAPIView.as_view()),
