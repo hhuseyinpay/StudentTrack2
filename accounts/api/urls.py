@@ -23,10 +23,10 @@ urlpatterns = [
     path('profile/all/', ListAllProfileAPIView.as_view()),
 
     path('admin/profile/', include(admin_router.urls)),
-    path('admin/profile/classroom/<int:classroom>/', ClassRoomProfileListAPIView.as_view()),
-    path('admin/profile/area/<int:area>/', AreaProfileListAPIView.as_view()),
-    path('admin/profile/region/<int:region>/', RegionProfileListAPIView.as_view()),
-    path('admin/profile/create/', ProfileCreateAPIView.as_view()),
+    # path('admin/profile/classroom/<int:classroom>/', ClassRoomProfileListAPIView.as_view()),
+    # path('admin/profile/area/<int:area>/', AreaProfileListAPIView.as_view()),
+    # path('admin/profile/region/<int:region>/', RegionProfileListAPIView.as_view()),
+    # path('admin/profile/create/', ProfileCreateAPIView.as_view()),
     # path('admin/profile/edit/', ProfileEditAPIView.as_view()),
 
     path('admin/myclassrooms/', AdminMyClassroomList.as_view()),

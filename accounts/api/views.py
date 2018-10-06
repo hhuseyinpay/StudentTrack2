@@ -6,6 +6,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
+
 from accounts.models import Profile, ClassRoom, Groups, Area, Region
 from .permissions import IsTeExAd, CanEditProfile
 from .serializer import ProfileModelSerializer, ProfileRetrieveUpdateDestroySeriazlizer, ListProfileSerializer, \
@@ -215,6 +218,8 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
 
     queryset = Profile.objects.all()
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter,)
+    filter_fields = ('classroom', 'related_area', 'related_region')
 
     def create(self, request, *args, **kwargs):
         serializer = AdminProfileCreateSerializer(data=request.data, context={'current_user': self.request.user})
