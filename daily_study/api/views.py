@@ -1,12 +1,11 @@
-from django.http import Http404
 from django.contrib.auth.models import User
 
-from rest_framework import generics, viewsets
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import PermissionDenied, NotFound
 
-from daily_study.models import DailyStudy, Study, Course
+from daily_study.models import DailyStudy, Course
 from .serializer import DailyStudyModelSerializer, GroupCourseModelSerializer, DailyStudyValidateSerializer
 from .permissions import IsTeExAd, CanEditDailyStudy, is_authority
 

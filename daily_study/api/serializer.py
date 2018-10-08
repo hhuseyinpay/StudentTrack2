@@ -64,35 +64,6 @@ class DailyStudyModelSerializer(serializers.ModelSerializer):
         return instance
 
 
-#
-# class DailyStudyViewsetSerializer(serializers.ModelSerializer):
-#     user = serializers.IntegerField(required=True)
-#     daily_study = StudyModelSerializer(required=True, many=True)
-#
-#     is_validated = serializers.BooleanField(required=True)
-#     validator_user = serializers.IntegerField(read_only=True)
-#     validate_time = serializers.DateTimeField(format="%d-%m-%Y %H:%M:%S", read_only=True)
-#
-#     timestamp = serializers.DateTimeField(format="%d-%m-%Y %H:%M:%S", read_only=True)
-#     updated = serializers.DateTimeField(format="%d-%m-%Y %H:%M:%S", read_only=True)
-#
-#     class Meta:
-#         model = DailyStudy
-#         fields = [
-#             'id', 'user', 'is_validated', 'validator_user', 'validate_time', 'timestamp', 'updated', 'daily_study'
-#         ]
-#
-#     def create(self, validated_data):
-#         daily_studies = validated_data.pop('daily_study')
-#
-#         # get the user from view and initial is_validated is false
-#         ds = DailyStudy.objects.create(user=self.context['user'], is_validated=False, **validated_data)
-#
-#         for daily_study in daily_studies:
-#             Study.objects.create(daily_study=ds, **daily_study)
-#         return ds
-
-
 class DailyStudyValidateSerializer(serializers.ModelSerializer):
     class Meta:
         model = DailyStudy
