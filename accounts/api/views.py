@@ -11,9 +11,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from accounts.models import Profile, ClassRoom, Groups, Area, Region
 from .permissions import IsTeExAd
-from .serializer import ProfileModelSerializer, ProfileRetrieveUpdateDestroySeriazlizer, ListProfileSerializer, \
-    ProfileCreateSerializer, PClassSerializer, PGroupSerializer, AdminProfileModelSerializer, \
-    AdminProfileCreateSerializer, AdminProfileUpdateSerializer
+from .serializer import ProfileModelSerializer, PClassSerializer, PGroupSerializer, \
+    AdminProfileModelSerializer, AdminProfileCreateSerializer, AdminProfileUpdateSerializer
 
 
 class UserLoginAPIView(views.ObtainAuthToken):
@@ -27,7 +26,7 @@ class UserLoginAPIView(views.ObtainAuthToken):
 
 
 class ListAllProfileAPIView(generics.ListAPIView):
-    serializer_class = ListProfileSerializer
+    serializer_class = ProfileModelSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
@@ -72,7 +71,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
 
     queryset = Profile.objects.all()
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter,)
-    filter_fields = ('classroom', 'related_area', 'related_region')
+    filter_fields = ('classroom', 'related_area', 'related_region', 'is_student', 'is_teacher')
 
     def create(self, request, *args, **kwargs):
         serializer = AdminProfileCreateSerializer(data=request.data, context={'current_user': self.request.user})
