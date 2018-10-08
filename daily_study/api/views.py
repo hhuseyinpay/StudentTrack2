@@ -72,7 +72,8 @@ class UserGroupCourseListAPIView(generics.ListAPIView):
         try:
             user = User.objects.get(id=self.kwargs['user'])
         except User.DoesNotExist:
-            raise NotFound("User not found")
+            # raise NotFound("User not found")
+            raise NotFound("Kullanıcı bulunamadı")
 
         group = user.profile.group
         if group:
@@ -111,7 +112,8 @@ class AdminDSNotvalidatedAPIView(generics.ListAPIView):
         try:
             user = User.objects.get(id=self.kwargs['user'])
         except User.DoesNotExist:
-            raise NotFound("User not found")
+            # raise NotFound("User not found")
+            raise NotFound("Kullanıcı bulunamadı")
         if not is_authority(self.request.user, user.profile):
             raise PermissionDenied()
         return DailyStudy.objects.filter(user=user, is_validated=False).order_by("-created_day")
@@ -151,7 +153,8 @@ class AdminDSIntervalListAPIView(generics.ListAPIView):
         try:
             user = User.objects.get(id=self.kwargs['user'])
         except User.DoesNotExist:
-            raise NotFound("User not found")
+            # raise NotFound("User not found")
+            raise NotFound("Kullanıcı bulunamadı")
         if not is_authority(self.request.user, user.profile):
             raise PermissionDenied()
 
