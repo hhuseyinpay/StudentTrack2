@@ -144,8 +144,8 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
 
             if data.get('classroom', False) and \
                     data['classroom'] not in ClassRoom.objects.filter(teachers=current_user):
-                error_respons['classroom'] = "You cannot assign classroom that you are not teacher"
-
+                #error_respons['classroom'] = "You cannot assign classroom that you are not teacher"
+                error_respons['sınıf'] = "Vakfı olmadığınız medreseye talebe oluşturamazsın."
         elif current_profile.is_executive:
             # currunt_profile hem teacher hem executive olabilir. Onun için hem classroom hem area'ya bakılıyor.
             if user_profile.classroom not in \
