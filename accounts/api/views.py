@@ -119,7 +119,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         if error_respons:
             return Response({'error': error_respons}, status=status.HTTP_403_FORBIDDEN)
 
-        # serializer.save()
+        serializer.save()
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
@@ -181,5 +181,5 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         if error_respons:
             return Response({'error': error_respons}, status=status.HTTP_403_FORBIDDEN)
 
-        # serializer.save()
+        serializer.save()
         return Response(data=serializer.data, status=status.HTTP_200_OK)
