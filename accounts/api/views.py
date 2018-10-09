@@ -125,7 +125,8 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         user_profile = self.get_object()
         user_user = user_profile.user
-        serializer = AdminProfileUpdateSerializer(data=request.data)
+        instance = self.get_object()
+        serializer = AdminProfileUpdateSerializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         current_user = request.user
