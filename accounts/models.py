@@ -55,7 +55,7 @@ class ProfileManager(models.Manager):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True, db_index=True)
-    phone_regex = RegexValidator(regex=r'^(05)[0-9][0-9] ([0-9]){3} ([0-9]){2} ([0-9]){2}$',
+    phone_regex = RegexValidator(regex=r'^(05)[0-9][0-9]([0-9]){7}$',
                                  message="Format hatası. Telefon numarası şu formatta olmalı:'05515524294'")
     phone_number = models.CharField(validators=[phone_regex], max_length=11, blank=True)  # validators should be a list
 
