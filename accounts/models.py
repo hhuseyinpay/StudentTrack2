@@ -1,5 +1,7 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
+from django.db import models
+from django.utils.timezone import now
 
 from base.models import Course
 
@@ -53,8 +55,12 @@ class ProfileManager(models.Manager):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True, db_index=True)
-    group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True)
+    phone_regex = RegexValidator(regex=r'^(05)[0-9][0-9] ([0-9]){3} ([0-9]){2} ([0-9]){2}$',
+                                 message="Format hatası. Telefon numarası şu formatta olmalı:'05515524294'")
+    phone_number = models.CharField(validators=[phone_regex], max_length=11, blank=True)  # validators should be a list
 
+    joined_date = models.DateField(default=now)
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True)
     classroom = models.ForeignKey(ClassRoom, on_delete=models.CASCADE, null=True, blank=True)
     related_area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     related_region = models.ForeignKey(Region, on_delete=models.CASCADE)
