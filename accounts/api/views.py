@@ -89,8 +89,6 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
                 error_respons['authority'] = "You cannot create a higher authority."
 
             if data['classroom'] not in ClassRoom.objects.filter(teachers=current_user):
-                print(data['classroom'])
-                print(ClassRoom.objects.filter(teachers=current_user))
                 error_respons['classroom'] = "You cannot assign classroom that you are not teacher"
 
         elif current_profile.is_executive:
@@ -124,7 +122,6 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         user_profile = self.get_object()
-        user_user = user_profile.user
         instance = self.get_object()
         serializer = AdminProfileUpdateSerializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -145,8 +142,8 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
 
             if data.get('classroom', False) and \
                     data['classroom'] not in ClassRoom.objects.filter(teachers=current_user):
-                #error_respons['classroom'] = "You cannot assign classroom that you are not teacher"
-                error_respons['sınıf'] = "Vakfı olmadığınız medreseye talebe oluşturamazsın."
+                # error_respons['classroom'] = "You cannot assign classroom that you are not teacher"
+                error_respons['sınıf'] = "Vakfı olmadığın medreseye talebe oluşturamazsın."
         elif current_profile.is_executive:
             # currunt_profile hem teacher hem executive olabilir. Onun için hem classroom hem area'ya bakılıyor.
             if user_profile.classroom not in \
