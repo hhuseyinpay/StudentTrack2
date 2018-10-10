@@ -2,7 +2,6 @@
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
 *$py.class
 
 # C extensions
@@ -105,14 +104,11 @@ venv.bak/
 .mypy_cache/
 
 /manage commands.txt
-.Procfile.un~
-.idea/dataSources.local.xml
-.idea/httpRequests/
-.idea/workspace.xml
-/student/settings/__init__.py
+student/settings/__init__.py
 
 media/reports/template/daily_study_mountly_lise.xlsx
 media/reports/template/daily_study_mountly_ortaokul.xlsx
 media/reports/template/daily_study_mountly_universite.xlsx
 media/reports/excel/daily_study/uni_test.xlsx
 
+.idea/
