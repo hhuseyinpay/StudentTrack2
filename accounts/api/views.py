@@ -10,9 +10,9 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 from accounts.models import Profile, ClassRoom, Groups, Area, Region
-from .permissions import IsTeExAd
+from .permissions import IsTeExAd, IsAdminExecutive
 from .serializer import ProfileModelSerializer, PClassSerializer, PGroupSerializer, \
-    AdminProfileModelSerializer, AdminProfileCreateSerializer, AdminProfileUpdateSerializer
+    AdminProfileModelSerializer, AdminProfileCreateSerializer, AdminProfileUpdateSerializer, AdminClassroomSerializer
 
 
 class UserLoginAPIView(views.ObtainAuthToken):
@@ -181,3 +181,12 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
 
         serializer.save()
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+
+class AdminClassroomViewSet(viewsets.ModelViewSet):
+    serializer_class = AdminClassroomSerializer
+    permission_classes = (IsAdminExecutive,)
+    authentication_classes = (TokenAuthentication,)
+
+    def get_queryset(self):
+        return ClassRoom.objects.filter(related_area=self.request.user.profile.related_area)

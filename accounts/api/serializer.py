@@ -202,3 +202,9 @@ class AdminProfileUpdateSerializer(AdminProfileCreateSerializer):
 
         instance.save()
         return instance
+
+
+class AdminClassroomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClassRoom
+        fields = '__all__'
