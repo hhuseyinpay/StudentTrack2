@@ -51,10 +51,10 @@ class ProfileModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = (
-            'id', 'user', 'group', 'classroom', 'related_area', 'related_region',
+            'id', 'user', 'phone_number', 'joined_date', 'group', 'classroom', 'related_area', 'related_region',
             'is_student', 'is_teacher', 'is_executive', 'is_admin'
         )
-        read_only_fields = ('is_student', 'is_teacher', 'is_executive', 'is_admin',)
+        read_only_fields = ('joined_date', 'is_student', 'is_teacher', 'is_executive', 'is_admin',)
 
     def update(self, instance, validated_data):
         validated_user = validated_data.get('user')
@@ -67,7 +67,7 @@ class ProfileModelSerializer(serializers.ModelSerializer):
             u.first_name = validated_user.get('first_name', u.first_name)
             u.last_name = validated_user.get('last_name', u.last_name)
             u.save()
-
+        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
         instance.save()
         return instance
 
@@ -83,7 +83,7 @@ class AdminProfileModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = (
-            'id', 'user', 'group', 'classroom', 'related_area', 'related_region',
+            'id', 'user', 'phone_number', 'joined_date', 'group', 'classroom', 'related_area', 'related_region',
             'is_student', 'is_teacher', 'is_executive', 'is_admin'
         )
 
@@ -125,7 +125,8 @@ class AdminProfileCreateSerializer(AdminProfileModelSerializer):
         current_user = self.context['current_user']
 
         pr = Profile(user=user, created_by=current_user)
-
+        pr.phone_number = self.validated_data['phone_number']
+        pr.joined_date = self.validated_data['joined_date']
         pr.group = self.validated_data['group']
 
         # student bir sınıfa aittir
@@ -163,6 +164,8 @@ class AdminProfileUpdateSerializer(AdminProfileCreateSerializer):
         instance.is_executive = validated_data.get('is_executive', instance.is_executive)
         # instance.is_admin = validated_data.get('is_admin', instance.admin)
 
+        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
+        instance.joined_date = validated_data.get('joined_date', instance.joined_date)
         instance.group = validated_data.get('group', instance.group)
 
         instance.classroom = validated_data.get('classroom', instance.classroom)
