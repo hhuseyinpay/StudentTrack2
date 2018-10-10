@@ -208,3 +208,9 @@ class AdminClassroomSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassRoom
         fields = '__all__'
+
+
+class AdminAreaSeriazlier(serializers.ModelSerializer):
+    class Meta:
+        model = Area
+        fields = '__all__'
