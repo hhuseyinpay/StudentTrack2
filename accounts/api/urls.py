@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from .views import ProfileViewSet, ListAllProfileAPIView, UserLoginAPIView, \
-    AdminMyClassroomList, AdminGroupList, AdminProfileViewSet, AdminClassroomViewSet, AdminAreaViewset
+    AdminGroupList, AdminProfileViewSet, AdminClassroomViewSet, AdminAreaViewset
 
 user_router = DefaultRouter()
 user_router.register('', ProfileViewSet, 'profileviewset')
@@ -29,7 +29,6 @@ urlpatterns = [
     # path('admin/profile/create/', ProfileCreateAPIView.as_view()),
     # path('admin/profile/edit/', ProfileEditAPIView.as_view()),
 
-    path('admin/myclassrooms/', AdminMyClassroomList.as_view()),
     path('admin/groups/', AdminGroupList.as_view())
 
     # path('create/', ProfileCreateAPIView.as_view(), name="user profile create"),

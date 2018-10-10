@@ -3,6 +3,7 @@ from rest_framework import generics, viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken import views
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -43,19 +44,6 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.
 
     def get_queryset(self):
         return Profile.objects.filter(id=self.request.user.profile.id)
-
-
-class AdminMyClassroomList(generics.ListAPIView):
-    serializer_class = PClassSerializer
-    permission_classes = (IsAuthenticated, IsTeExAd)
-    authentication_classes = (TokenAuthentication,)
-
-    def get_queryset(self):
-        user = self.request.user
-        # bu sorgu sadeleştirilmeli....
-        return ClassRoom.objects.filter(Q(teachers=user) |
-                                        Q(related_area__executives=user) |
-                                        Q(related_area__related_region__admins=user)).distinct()
 
 
 class AdminGroupList(generics.ListAPIView):
@@ -191,6 +179,19 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return ClassRoom.objects.filter(related_area=self.request.user.profile.related_area)
+
+    @action(detail=False)
+    def myclassrooms(self, request):
+        user = request.user
+        if user.profile.is_teacher and not user.profile.is_executive:
+            classrooms = ClassRoom.objects.filter(teachers=user)
+        elif user.profile.is_executive:
+            classrooms = ClassRoom.objects.filter(related_area=user.profile.related_area)
+        else:
+            classrooms = ClassRoom.objects.filter(related_area__related_region=user.profile.related_region)
+
+        serializer = PClassSerializer(classrooms, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class AdminAreaViewset(viewsets.ModelViewSet):
