@@ -11,7 +11,7 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 from accounts.models import Profile, ClassRoom, Groups, Area, Region
-from .permissions import IsTeExAd, IsAdminExecutive, IsAdmin
+from .permissions import IsTeExAd, IsAdminExecutive, IsAdmin, IsTeacher
 from .serializer import ProfileModelSerializer, PClassSerializer, PGroupSerializer, \
     AdminProfileModelSerializer, AdminProfileCreateSerializer, AdminProfileUpdateSerializer, AdminClassroomSerializer, \
     AdminAreaSeriazlier
@@ -178,18 +178,14 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
-        return ClassRoom.objects.filter(related_area=self.request.user.profile.related_area)
-
-    @action(detail=False)
-    def myclassrooms(self, request):
-        user = request.user
-        if user.profile.is_teacher and not user.profile.is_executive:
-            classrooms = ClassRoom.objects.filter(teachers=user)
-        elif user.profile.is_executive:
-            classrooms = ClassRoom.objects.filter(related_area=user.profile.related_area)
+        if self.request.user.profile.is_executive:
+            return ClassRoom.objects.filter(related_area=self.request.user.profile.related_area)
         else:
-            classrooms = ClassRoom.objects.filter(related_area__related_region=user.profile.related_region)
+            return ClassRoom.objects.filter(related_area__related_region=self.request.user.profile.related_region)
 
+    @action(detail=False, permission_classes=[IsTeacher])
+    def myclassrooms(self, request):
+        classrooms = ClassRoom.objects.filter(teachers=request.user)
         serializer = PClassSerializer(classrooms, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
