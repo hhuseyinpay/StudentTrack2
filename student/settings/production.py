@@ -15,6 +15,6 @@ DATABASES = {
         'PASSWORD': '1',
         'HOST': 'localhost',
         'PORT': '',
+        'CONN_MAX_AGE': 60 * 10,  # 10 minutes
     }
 }
-
