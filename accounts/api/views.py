@@ -1,6 +1,5 @@
 from django.db.models import Q
 from rest_framework import generics, viewsets, mixins, status
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken import views
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
@@ -30,7 +29,6 @@ class UserLoginAPIView(views.ObtainAuthToken):
 class ListAllProfileAPIView(generics.ListAPIView):
     serializer_class = ProfileModelSerializer
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         return Profile.objects.all()
@@ -40,7 +38,6 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.
                      viewsets.GenericViewSet):
     serializer_class = ProfileModelSerializer
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         return Profile.objects.filter(id=self.request.user.profile.id)
@@ -49,14 +46,12 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.
 class AdminGroupList(generics.ListAPIView):
     serializer_class = PGroupSerializer
     # permission_classes = (IsAuthenticated, IsTeExAd)
-    # authentication_classes = (TokenAuthentication,)
     queryset = Groups.objects.all()
 
 
 class AdminProfileViewSet(viewsets.ModelViewSet):
     serializer_class = AdminProfileModelSerializer
     permission_classes = (IsAuthenticated, IsTeExAd)
-    authentication_classes = (TokenAuthentication,)
 
     queryset = Profile.objects.all()
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter,)
@@ -175,7 +170,6 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
 class AdminClassroomViewSet(viewsets.ModelViewSet):
     serializer_class = AdminClassroomSerializer
     permission_classes = (IsAdminExecutive,)
-    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         if self.request.user.profile.is_executive:
@@ -193,7 +187,6 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
 class AdminAreaViewset(viewsets.ModelViewSet):
     serializer_class = AdminAreaSeriazlier
     permission_classes = (IsAdmin,)
-    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         return Area.objects.filter(related_region=self.request.user.profile.related_region)

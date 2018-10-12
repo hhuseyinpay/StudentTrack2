@@ -2,7 +2,6 @@ from django.contrib.auth.models import User
 
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import PermissionDenied, NotFound
 
 from daily_study.models import DailyStudy, Course
@@ -13,7 +12,6 @@ from .permissions import IsTeExAd, CanEditDailyStudy, is_authority
 class DSListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         return DailyStudy.objects.get_day(self.request.user)
@@ -25,7 +23,6 @@ class DSListCreateAPIView(generics.ListCreateAPIView):
 class DSRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
     lookup_field = 'id'
 
     def get_serializer_context(self):
@@ -39,7 +36,6 @@ class DSRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
 class DSIntervalListAPIView(generics.ListAPIView):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         user = self.request.user
@@ -52,7 +48,6 @@ class DSIntervalListAPIView(generics.ListAPIView):
 class GroupCourseListAPIView(generics.ListAPIView):
     serializer_class = GroupCourseModelSerializer
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         group = self.request.user.profile.group
@@ -64,7 +59,6 @@ class GroupCourseListAPIView(generics.ListAPIView):
 class UserGroupCourseListAPIView(generics.ListAPIView):
     serializer_class = GroupCourseModelSerializer
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
 
@@ -83,7 +77,6 @@ class UserGroupCourseListAPIView(generics.ListAPIView):
 class AdminDSRetrieveUpdateAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated, CanEditDailyStudy,)
-    authentication_classes = (TokenAuthentication,)
     queryset = DailyStudy.objects.all()
     lookup_field = 'id'
 
@@ -94,7 +87,6 @@ class AdminDSRetrieveUpdateAPIView(generics.RetrieveUpdateDestroyAPIView):
 class AdminDSValidateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = DailyStudyValidateSerializer
     permission_classes = (IsAuthenticated, CanEditDailyStudy,)
-    authentication_classes = (TokenAuthentication,)
     queryset = DailyStudy.objects.all()
     lookup_field = 'id'
 
@@ -105,7 +97,6 @@ class AdminDSValidateAPIView(generics.RetrieveUpdateAPIView):
 class AdminDSNotvalidatedAPIView(generics.ListAPIView):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated, IsTeExAd,)
-    atuhentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         try:
@@ -121,7 +112,6 @@ class AdminDSNotvalidatedAPIView(generics.ListAPIView):
 class AdminDSClassroomListAPIView(generics.ListAPIView):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated, IsTeExAd,)
-    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         user = self.request.user
@@ -134,7 +124,6 @@ class AdminDSClassroomListAPIView(generics.ListAPIView):
 class AdminDsRetrieveUserDayAPIView(generics.RetrieveAPIView):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated, CanEditDailyStudy)
-    authentication_classes = (TokenAuthentication,)
     lookup_field = "user"
 
     def get_queryset(self):
@@ -146,7 +135,6 @@ class AdminDsRetrieveUserDayAPIView(generics.RetrieveAPIView):
 class AdminDSIntervalListAPIView(generics.ListAPIView):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated, IsTeExAd)
-    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         try:
