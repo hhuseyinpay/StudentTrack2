@@ -166,6 +166,9 @@ DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 REPORT_DAILYSTUDY_DIRECTORY = MEDIA_ROOT + '/reports/excel/daily_study/'
 REPORT_TEMPLATE_DIRECTORY = MEDIA_ROOT + '/reports/template/'
 
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
