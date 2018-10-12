@@ -104,11 +104,12 @@ venv.bak/
 .mypy_cache/
 
 /manage commands.txt
-student/settings/__init__.py
+/student/settings/__init__.py
 
-media/reports/template/daily_study_mountly_lise.xlsx
-media/reports/template/daily_study_mountly_ortaokul.xlsx
-media/reports/template/daily_study_mountly_universite.xlsx
-media/reports/excel/daily_study/uni_test.xlsx
+/media/reports/template/daily_study_mountly_lise.xlsx
+/media/reports/template/daily_study_mountly_ortaokul.xlsx
+/media/reports/template/daily_study_mountly_universite.xlsx
+/media/reports/excel/daily_study/uni_test.xlsx
 
-.idea/
+/.idea/
+/student/settings/debug_local.py
