@@ -2,13 +2,15 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from .views import ProfileViewSet, ListAllProfileAPIView, UserLoginAPIView, \
-    AdminGroupList, AdminProfileViewSet, AdminClassroomViewSet, AdminAreaViewset
+    AdminGroupList, AdminProfileViewSet,AdminClassroomViewSet, \
+    AdminAreaViewset
 
 user_router = DefaultRouter()
 user_router.register('', ProfileViewSet, 'profileviewset')
 
 admin_router = DefaultRouter()
-admin_router.register('profile', AdminProfileViewSet, 'admin_profileviewset')
+admin_router.register('profile', AdminProfileViewSet, 'admin_profile_viewset')
+
 admin_router.register('classroom', AdminClassroomViewSet, 'admin_classroomviewset')
 admin_router.register('area', AdminAreaViewset, 'admin-areaviewset')
 

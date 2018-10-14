@@ -10,10 +10,13 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 from accounts.models import Profile, ClassRoom, Groups, Area, Region
-from .permissions import IsTeExAd, IsAdminExecutive, IsAdmin, IsTeacher
-from .serializer import ProfileModelSerializer, PClassSerializer, PGroupSerializer, \
-    AdminProfileModelSerializer, AdminProfileCreateSerializer, AdminProfileUpdateSerializer, AdminClassroomSerializer, \
-    AdminAreaSeriazlier
+from .permissions import IsTeacherExecutiveAdmin, IsExecutiveAdmin, IsAdmin, IsTeacher
+from .serializer import (
+    ProfileModelSerializer, PClassSerializer, PGroupSerializer, \
+    AdminProfileModelSerializer, AdminProfileCreateSerializer, AdminMakeStudentSeriazlier, \
+    AdminChangeClassRoomSerializer, AdminChangeAreaSerializer, \
+    AdminClassroomSerializer, AdminAreaSeriazlier
+)
 
 
 class UserLoginAPIView(views.ObtainAuthToken):
@@ -54,117 +57,146 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, IsTeExAd)
 
     queryset = Profile.objects.all()
-    filter_backends = (DjangoFilterBackend, filters.OrderingFilter,)
-    filter_fields = ('classroom', 'related_area', 'related_region', 'is_student', 'is_teacher')
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
+    filter_fields = ('is_student', 'is_teacher', 'is_executive', 'classroom', 'related_area', 'related_region')
 
     def create(self, request, *args, **kwargs):
-        serializer = AdminProfileCreateSerializer(data=request.data, context={'current_user': self.request.user})
+        serializer = AdminProfileCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        current_user = request.user
-        current_profile = current_user.profile  # currunt profile
-        error_respons = {}
-
-        if current_profile.is_teacher and not current_profile.is_executive:
-            if not data.get('is_student', False):
-                error_respons['is_student'] = "You can only create a student."
-
-            if data.get('is_teacher', False) or data.get('is_executive', False) or data.get('is_admin', False):
-                error_respons['authority'] = "You cannot create a higher authority."
-
-            if data['classroom'] not in ClassRoom.objects.filter(teachers=current_user):
-                error_respons['classroom'] = "You cannot assign classroom that you are not teacher"
-
-        elif current_profile.is_executive:
-            if data.get('is_student', False) and data.get('is_teacher', False):
-                error_respons['is_student-is_teacher'] = "The profile cannot be student and teacher in the same time."
-
-            if data.get('is_executive', False) or data.get('is_admin', False):
-                error_respons['authority'] = "You cannot create a higher authority."
-
-            if data.get('is_student', False) and \
-                    data['classroom'] not in ClassRoom.objects.filter(Q(related_area__executives=current_user) |
-                                                                      Q(teachers=current_user)):
-                error_respons['classroom'] = "You cannot assign classroom that you are not executive"
-
-        elif current_profile.is_admin:
-            if data.get('is_student', False):
-                if data.get('is_teacher', False) or data.get('is_executive', False):
-                    error_respons['is_*'] = "The profile cannot be student and (teacher or executive) in the same time."
-
-            if data.get('is_admin', False):
-                error_respons['authority'] = "You cannot create a higher authority."
-
-            if data['classroom'] not in ClassRoom.objects.filter(related_area__related_region__admins=current_user):
-                error_respons['classroom'] = "You cannot assign classroom that you are not executive"
-
-        if error_respons:
-            return Response({'error': error_respons}, status=status.HTTP_403_FORBIDDEN)
-
-        serializer.save()
+        print(request.user.profile.related_region)
+        serializer.save(created_by=request.user,
+                        related_region=request.user.profile.related_region)  # her yeni profil student olarak başlar
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
-    def partial_update(self, request, *args, **kwargs):
-        user_profile = self.get_object()
+    def has_object_permission(self, request, view, obj):
+        admin_user = request.user
+        if admin_user == obj.user:
+            return True
+        if admin_user.profile.is_teacher and obj.is_student:
+            if obj.classroom in ClassRoom.objects.filter(teachers=admin_user):
+                return True
+        if admin_user.profile.is_executive and not obj.is_executive and not obj.is_admin:
+            if obj.related_area in Area.objects.filter(executives=admin_user):
+                return True
+        elif admin_user.profile.is_admin and not obj.is_admin:
+            if obj.related_region in Region.objects.filter(admins=admin_user):
+                return True
+        return False
+
+    def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = AdminProfileUpdateSerializer(instance, data=request.data, partial=True)
+        serializer = AdminProfileCreateSerializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        current_user = request.user
-        current_profile = current_user.profile  # currunt profile
-        error_respons = {}
-
-        if current_profile.is_teacher and not current_profile.is_executive:
-            if user_profile.classroom not in ClassRoom.objects.filter(teachers=current_user):
-                return Response({'error': "You cannot edit this profile"}, status=status.HTTP_403_FORBIDDEN)
-
-            if not data.get('is_student', True):  # bu fieldı göndermediyse sıkıntı yok
-                error_respons['is_student'] = "You cannot change the student."
-
-            if data.get('is_teacher', False) or data.get('is_executive', False) or data.get('is_admin', False):
-                error_respons['authority'] = "You cannot create a higher authority."
-
-            if data.get('classroom', False) and \
-                    data['classroom'] not in ClassRoom.objects.filter(teachers=current_user):
-                # error_respons['classroom'] = "You cannot assign classroom that you are not teacher"
-                error_respons['sınıf'] = "Vakfı olmadığın medreseye talebe oluşturamazsın."
-        elif current_profile.is_executive:
-            # currunt_profile hem teacher hem executive olabilir. Onun için hem classroom hem area'ya bakılıyor.
-            if user_profile.classroom not in \
-                    ClassRoom.objects.filter(related_area__executives=current_user) or \
-                    user_profile.related_area not in \
-                    Area.objects.filter(executives=current_user):
-                return Response({'error': "You cannot edit this profile"}, status=status.HTTP_403_FORBIDDEN)
-
-            if data.get('is_student', False) and data.get('is_teacher', False):
-                error_respons['is_student-is_teacher'] = "The profile cannot be student and teacher in the same time."
-
-            if data.get('is_executive', False) or data.get('is_admin', False):
-                error_respons['authority'] = "You cannot create a higher authority."
-
-            if data.get('classroom', False) and \
-                    data['classroom'] not in ClassRoom.objects.filter(related_area__executives=current_user):
-                error_respons['classroom'] = "You cannot assign classroom that you are not executive"
-
-        elif current_profile.is_admin:
-            if user_profile.related_region not in Region.objects.filter(admins=current_user):
-                return Response({'error': "You cannot edit this profile"}, status=status.HTTP_403_FORBIDDEN)
-
-            if data.get('is_student', False):
-                if data.get('is_teacher', False) or data.get('is_executive', False):
-                    error_respons['is_*'] = "The profile cannot be student and (teacher or executive) in the same time."
-
-            if data.get('is_admin', False):
-                error_respons['authority'] = "You cannot create a higher authority."
-
-            if data['classroom'] not in ClassRoom.objects.filter(related_area__related_region__admins=current_user):
-                error_respons['classroom'] = "You cannot assign classroom that you are not executive"
-
-        if error_respons:
-            return Response({'error': error_respons}, status=status.HTTP_403_FORBIDDEN)
-
         serializer.save()
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+        body = self.get_serializer(instance).data
+        return Response(data=body, status=status.HTTP_202_ACCEPTED)
+
+    @action(detail=True, methods=['put'], permission_classes=[IsTeacherExecutiveAdmin])
+    def makestudent(self, request, pk=None):
+        profile = self.get_object()
+        serializer = AdminMakeStudentSeriazlier(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        classroom = serializer.validated_data['classroom']
+        group = serializer.validated_data['group']
+
+        if classroom not in ClassRoom.objects.filter(teachers=request.user) and \
+                classroom.related_area not in Area.objects.filter(Q(executives=request.user) |
+                                                                  Q(related_region__admins=request.user)):
+            body = {
+                "error": {
+                    "classroom": "You have not authority on this classroom"
+                }
+            }
+            return Response(data=body, status=status.HTTP_400_BAD_REQUEST)
+
+        profile.group = group
+        profile.classroom = classroom
+        profile.related_area = classroom.related_area
+        profile.related_region = classroom.related_area.related_region
+        profile.is_student = True
+        profile.is_teacher = False
+        profile.is_executive = False
+        profile.save()
+
+        body = self.get_serializer(profile).data
+        return Response(data=body, status=status.HTTP_202_ACCEPTED)
+
+    @action(detail=True, methods=['put'], permission_classes=[IsExecutiveAdmin])
+    def maketeacher(self, request, pk=None):
+        profile = self.get_object()
+
+        profile.is_student = False
+        profile.is_teacher = True
+        profile.save()
+
+        body = self.get_serializer(profile).data
+        return Response(data=body, status=status.HTTP_202_ACCEPTED)
+
+    @action(detail=True, methods=['put'], permission_classes=[IsAdmin])
+    def makeexecutive(self, request, pk=None):
+        profile = self.get_object()
+
+        profile.is_student = False
+        profile.is_executive = True
+        profile.save()
+
+        body = self.get_serializer(profile).data
+        return Response(data=body, status=status.HTTP_202_ACCEPTED)
+
+    @action(detail=True, methods=['put'], permission_classes=[IsExecutiveAdmin])
+    def changeclassroom(self, request, pk=None):
+        profile = self.get_object()
+        seriazlier = AdminChangeClassRoomSerializer(request.data)
+        seriazlier.is_valid(raise_exception=True)
+        classroom = seriazlier.validated_data['classroom']  # class none yapılabilir.
+
+        if not classroom:
+            profile.classroom = None
+        else:
+            if classroom.related_area not in Area.objects.filter(Q(executives=request.user) |
+                                                                 Q(related_region__admins=request.user)):
+                body = {
+                    "error": {
+                        "classroom": "You have not authority on this classroom"
+                    }
+                }
+                return Response(data=body, status=status.HTTP_400_BAD_REQUEST)
+            profile.classroom = classroom
+            profile.related_area = classroom.related_area
+            profile.related_region = classroom.related_area.related_region
+
+        profile.save()
+
+        body = self.get_serializer(profile).data
+        return Response(data=body, status=status.HTTP_202_ACCEPTED)
+
+    @action(detail=True, methods=['put'], permission_classes=[IsExecutiveAdmin])
+    def changearea(self, request, pk=None):
+        profile = self.get_object()
+        seriazlier = AdminChangeAreaSerializer(request.data)
+        seriazlier.is_valid(raise_exception=True)
+        related_area = seriazlier.validated_data['related_area']  # class none yapılabilir.
+
+        if not related_area:
+            profile.related_area = None
+        else:
+            if related_area.related_region not in Region.objects.filter(admins=request.user):
+                body = {
+                    "error": {
+                        "area": "You have not authority on this area"
+                    }
+                }
+                return Response(data=body, status=status.HTTP_400_BAD_REQUEST)
+
+            profile.related_area = related_area
+            profile.related_region = related_area.related_region
+
+        profile.classroom = None
+        profile.save()
+
+        body = self.get_serializer(profile).data
+        return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
 
 class AdminClassroomViewSet(viewsets.ModelViewSet):

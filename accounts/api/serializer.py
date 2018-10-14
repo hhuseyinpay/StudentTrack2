@@ -4,9 +4,9 @@ from accounts.models import User, Profile, Groups, Region, Area, ClassRoom
 
 
 class UserModelSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(max_length=30)
-    first_name = serializers.CharField(max_length=50)
-    last_name = serializers.CharField(max_length=30)
+    username = serializers.CharField(min_length=3, max_length=30)
+    first_name = serializers.CharField(min_length=2, max_length=50)
+    last_name = serializers.CharField(min_length=2, max_length=30)
     password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -76,9 +76,8 @@ class AdminProfileModelSerializer(serializers.ModelSerializer):
     user = UserModelSerializer()
     classroom = PClassSerializer()
     related_area = PAreaSerializer()
-    related_region = PRegionSerializer(read_only=True)
-
-    group = PGroupSerializer(read_only=True)
+    related_region = PRegionSerializer()
+    group = PGroupSerializer()
 
     class Meta:
         model = Profile
@@ -86,122 +85,68 @@ class AdminProfileModelSerializer(serializers.ModelSerializer):
             'id', 'user', 'phone_number', 'joined_date', 'group', 'classroom', 'related_area', 'related_region',
             'is_student', 'is_teacher', 'is_executive', 'is_admin'
         )
-
-    def validate(self, attrs):
-        if attrs.get('is_student', False) or attrs.get('is_teacher', False):
-            if not attrs.get('classroom', None):
-                raise serializers.ValidationError("classroom filed cannot be blank")
-            if attrs['classroom'].related_area != attrs['related_area']:
-                raise serializers.ValidationError("classroom not in related area")
-            if attrs['related_area'].related_region != attrs['related_region']:
-                raise serializers.ValidationError("related area not in related region")
-
-        if attrs.get('is_executive', False):
-            if not attrs.get('related_area', None):
-                raise serializers.ValidationError("related_area filed cannot be blank")
-            if attrs['related_area'].related_region != attrs['related_region']:
-                raise serializers.ValidationError("related area not in related region")
-
-        ###
-        # buraya ekstra kontroller koyulaması gerekiyor ......
-        ###
-        return attrs
-
-
-class AdminProfileCreateSerializer(AdminProfileModelSerializer):
-    classroom = serializers.PrimaryKeyRelatedField(required=False, queryset=ClassRoom.objects.all())
-    related_area = serializers.PrimaryKeyRelatedField(required=False, queryset=Area.objects.all())
-    related_region = serializers.PrimaryKeyRelatedField(required=True, queryset=Region.objects.all())
-    group = serializers.PrimaryKeyRelatedField(required=False, queryset=Groups.objects.all())
+        read_only_fields = (
+            'is_student', 'is_teacher', 'is_executive', 'is_admin', 'classroom', 'related_area', 'related_region'
+        )
 
     def create(self, validated_data):
-        u = validated_data['user']
+        u = validated_data.pop('user')
         password = u.pop('password')
 
         user = User(**u)  # new user create
         user.set_password(password)
         user.save()
 
-        current_user = self.context['current_user']
-
-        pr = Profile(user=user, created_by=current_user)
-        pr.phone_number = self.validated_data['phone_number']
-        pr.joined_date = self.validated_data['joined_date']
-        pr.group = self.validated_data['group']
-
-        # student bir sınıfa aittir
-        pr.is_student = validated_data.get('is_student', False)
-        if pr.is_student:
-            pr.classroom = validated_data['classroom']
-            pr.related_area = validated_data['related_area']
-
-        # teacher bir sınıfa ait değildir
-        pr.is_teacher = validated_data.get('is_teacher', False)
-        if pr.is_teacher:
-            validated_data['classroom'].teachers.add(user)
-            pr.related_area = validated_data['related_area']
-
-        # executive areaya ait değildir
-        pr.is_executive = validated_data.get('is_executive', False)
-        if pr.is_executive:
-            validated_data['related_area'].executives.add(user)
-
-        # admin daha sonra düşünülecek ****
-        # pr.is_admin = validated_data.get('is_admin', False)
-        pr.related_region = validated_data['related_region']
-
-        pr.save()
-        return pr
-
-
-class AdminProfileUpdateSerializer(AdminProfileCreateSerializer):
-    user = UserModelSerializer(required=False)
-    related_region = serializers.PrimaryKeyRelatedField(required=False, queryset=Region.objects.all())
+        return Profile.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
-        instance.is_student = validated_data.get('is_student', instance.is_student)
-        instance.is_teacher = validated_data.get('is_teacher', instance.is_teacher)
-        instance.is_executive = validated_data.get('is_executive', instance.is_executive)
-        # instance.is_admin = validated_data.get('is_admin', instance.admin)
-
-        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
-        instance.joined_date = validated_data.get('joined_date', instance.joined_date)
-        instance.group = validated_data.get('group', instance.group)
-
-        instance.classroom = validated_data.get('classroom', instance.classroom)
-        instance.related_area = validated_data.get('related_area', instance.classroom)
-        instance.related_region = validated_data.get('related_region', instance.classroom)
-
-        # student bir sınıfa aittir
-
-        if validated_data.get('is_student', False):
-            instance.is_student = True
-            instance.classroom = validated_data['classroom']
-            instance.related_area = validated_data['related_area']
-
-        # teacher bir sınıfa ait değildir, ama bölgeye aittir
-        if validated_data.get('is_teacher', False):
-            instance.is_teacher = True
-            validated_data['classroom'].teachers.add(instance.user)
-            instance.related_area = validated_data['related_area']
-
-        # executive areaya ait değildir
-        if validated_data.get('is_executive', False):
-            instance.is_executive = True
-            validated_data['related_area'].executives.add(instance.user)
-
-        validated_user = validated_data.get('user')
+        validated_user = validated_data.pop('user')
         if validated_user:
             u = User.objects.get(profile=instance)
             u.username = validated_user.get('username', u.username)
-            u.password = validated_user.get('password', u.password)
+            if validated_user.get('password'):
+                u.set_password(validated_user.get('password'))
 
             u.first_name = validated_user.get('first_name', u.first_name)
             u.last_name = validated_user.get('last_name', u.last_name)
             u.save()
 
+        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
+        instance.joined_date = validated_data.get('joined_date', instance.joined_date)
+        instance.group = validated_data.get('group', instance.group)
+
+        instance.is_student = validated_data.get('is_student', instance.is_student)
+        instance.is_teacher = validated_data.get('is_teacher', instance.is_teacher)
+        instance.is_executive = validated_data.get('is_executive', instance.is_executive)
+        # instance.is_admin = validated_data.get('is_admin', instance.admin)
+
+        instance.classroom = validated_data.get('classroom', instance.classroom)
+        instance.related_area = validated_data.get('related_area', instance.related_area)
+        instance.related_region = validated_data.get('related_region', instance.related_region)
+
         instance.save()
         return instance
+
+
+class AdminProfileCreateSerializer(AdminProfileModelSerializer):
+    classroom = serializers.PrimaryKeyRelatedField(read_only=True)
+    related_area = serializers.PrimaryKeyRelatedField(read_only=True)
+    related_region = serializers.PrimaryKeyRelatedField(read_only=True)
+    group = serializers.PrimaryKeyRelatedField(required=False, queryset=Groups.objects.all())
+    joined_date = serializers.DateField(required=True)
+
+
+class AdminMakeStudentSeriazlier(serializers.Serializer):
+    classroom = serializers.PrimaryKeyRelatedField(queryset=ClassRoom.objects.all())
+    group = serializers.PrimaryKeyRelatedField(queryset=Groups.objects.all())
+
+
+class AdminChangeClassRoomSerializer(serializers.Serializer):
+    classroom = serializers.PrimaryKeyRelatedField(required=False, queryset=ClassRoom.objects.all())
+
+
+class AdminChangeAreaSerializer(serializers.Serializer):
+    related_area = serializers.PrimaryKeyRelatedField(required=False, queryset=ClassRoom.objects.all())
 
 
 class AdminClassroomSerializer(serializers.ModelSerializer):
