@@ -1,9 +1,9 @@
 from rest_framework import permissions
 
-from accounts.api.permissions import IsTeExAd, is_authority
+from accounts.api.permissions import IsTeacherExecutiveAdmin, is_authority
 
 
-class CanEditSyllabus(IsTeExAd):
+class CanEditSyllabus(IsTeacherExecutiveAdmin):
     def has_object_permission(self, request, view, obj):
         current_user = request.user
         usersyllabus_profile = obj.user.profile

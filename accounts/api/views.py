@@ -54,8 +54,7 @@ class AdminGroupList(generics.ListAPIView):
 
 class AdminProfileViewSet(viewsets.ModelViewSet):
     serializer_class = AdminProfileModelSerializer
-    permission_classes = (IsAuthenticated, IsTeExAd)
-
+    permission_classes = (IsAuthenticated, IsTeacherExecutiveAdmin)
     queryset = Profile.objects.all()
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filter_fields = ('is_student', 'is_teacher', 'is_executive', 'classroom', 'related_area', 'related_region')
@@ -201,7 +200,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
 
 class AdminClassroomViewSet(viewsets.ModelViewSet):
     serializer_class = AdminClassroomSerializer
-    permission_classes = (IsAdminExecutive,)
+    permission_classes = (IsExecutiveAdmin,)
 
     def get_queryset(self):
         if self.request.user.profile.is_executive:

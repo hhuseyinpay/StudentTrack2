@@ -61,11 +61,11 @@ class Profile(models.Model):
 
     joined_date = models.DateField(default=now)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True)
-    classroom = models.ForeignKey(ClassRoom, on_delete=models.CASCADE, null=True, blank=True)
-    related_area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
+    classroom = models.ForeignKey(ClassRoom, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    related_area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True, default=None)
     related_region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
-    is_student = models.BooleanField(default=True)
+    is_student = models.BooleanField(default=False)
     is_teacher = models.BooleanField(default=False)
     is_executive = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)

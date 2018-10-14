@@ -7,7 +7,7 @@ from rest_framework.generics import views
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from accounts.api.permissions import IsTeExAd
+from accounts.api.permissions import IsTeacherExecutiveAdmin
 from .serializer import DailyStudyReportGeneratorSerialzier
 from daily_study.models import DailyStudy, Study
 from accounts.models import Profile, Groups
@@ -15,7 +15,7 @@ from .excel_generator import ExcelGenerator
 
 
 class DailyStudyReportGeneratorAPIView(views.APIView):
-    permission_classes = (IsAuthenticated, IsTeExAd)
+    permission_classes = (IsAuthenticated, IsTeacherExecutiveAdmin)
 
     def post(self, request):
         serializer = DailyStudyReportGeneratorSerialzier(data=request.data)

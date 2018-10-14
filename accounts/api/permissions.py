@@ -22,14 +22,14 @@ class IsAdmin(permissions.BasePermission):
         return False
 
 
-class IsAdminExecutive(permissions.BasePermission):
+class IsExecutiveAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.profile.is_executive or request.user.profile.is_admin:
             return True
         return False
 
 
-class IsTeExAd(permissions.BasePermission):
+class IsTeacherExecutiveAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         p = request.user.profile
         if p.is_teacher or p.is_executive or p.is_admin:
@@ -62,7 +62,7 @@ def is_authority(authority_user, low_authority_profile):
     return False
 
 
-class CanEditProfile(IsTeExAd):
+class CanEditProfile(IsTeacherExecutiveAdmin):
     def has_object_permission(self, request, view, obj):
         user = request.user
         return is_authority(user, obj)

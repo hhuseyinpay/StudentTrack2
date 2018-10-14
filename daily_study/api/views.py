@@ -6,7 +6,7 @@ from rest_framework.exceptions import PermissionDenied, NotFound
 
 from daily_study.models import DailyStudy, Course
 from .serializer import DailyStudyModelSerializer, GroupCourseModelSerializer, DailyStudyValidateSerializer
-from .permissions import IsTeExAd, CanEditDailyStudy, is_authority
+from .permissions import IsTeacherExecutiveAdmin, CanEditDailyStudy, is_authority
 
 
 class DSListCreateAPIView(generics.ListCreateAPIView):
@@ -96,7 +96,7 @@ class AdminDSValidateAPIView(generics.RetrieveUpdateAPIView):
 
 class AdminDSNotvalidatedAPIView(generics.ListAPIView):
     serializer_class = DailyStudyModelSerializer
-    permission_classes = (IsAuthenticated, IsTeExAd,)
+    permission_classes = (IsAuthenticated, IsTeacherExecutiveAdmin,)
 
     def get_queryset(self):
         try:
@@ -111,7 +111,7 @@ class AdminDSNotvalidatedAPIView(generics.ListAPIView):
 
 class AdminDSClassroomListAPIView(generics.ListAPIView):
     serializer_class = DailyStudyModelSerializer
-    permission_classes = (IsAuthenticated, IsTeExAd,)
+    permission_classes = (IsAuthenticated, IsTeacherExecutiveAdmin,)
 
     def get_queryset(self):
         user = self.request.user
@@ -134,7 +134,7 @@ class AdminDsRetrieveUserDayAPIView(generics.RetrieveAPIView):
 
 class AdminDSIntervalListAPIView(generics.ListAPIView):
     serializer_class = DailyStudyModelSerializer
-    permission_classes = (IsAuthenticated, IsTeExAd)
+    permission_classes = (IsAuthenticated, IsTeacherExecutiveAdmin)
 
     def get_queryset(self):
         try:
