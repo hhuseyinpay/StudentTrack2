@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from accounts.models import User, Profile, Groups, Region, Area, ClassRoom
 
@@ -93,6 +94,13 @@ class AdminProfileModelSerializer(serializers.ModelSerializer):
         u = validated_data.pop('user')
         password = u.pop('password')
 
+        if User.objects.filter(username=u['username']).exists():
+            error = {
+                "error": {
+                    "username": "Bu kullanıcı Adı başkası tarafından alındı."
+                }
+            }
+            raise ValidationError(error)
         user = User(**u)  # new user create
         user.set_password(password)
         user.save()
