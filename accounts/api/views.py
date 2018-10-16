@@ -76,6 +76,17 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         body = self.get_serializer(instance).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
+    @action(detail=False, permission_classes=[IsExecutiveAdmin])
+    def myteachers(self, request):
+        staff = request.user
+        qs = Profile.objects.filter(is_teacher=True, is_executive=False)
+        if staff.profile.is_executive:
+            teachers = qs.filter(related_area__executives=staff)
+        else:
+            teachers = qs.filter(related_region__admins=staff)
+        serializer = AdminProfileModelSerializer(teachers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=['put'], permission_classes=[IsTeacherExecutiveAdmin])
     def makestudent(self, request, pk=None):
         profile = self.get_object()
