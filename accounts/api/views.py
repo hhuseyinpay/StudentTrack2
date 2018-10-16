@@ -192,6 +192,15 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
         else:
             return ClassRoom.objects.filter(related_area__related_region=self.request.user.profile.related_region)
 
+    @action(detail=True, methods=['get'])
+    def teachers(self, request, pk=None):
+        classroom = self.get_object()
+        teachers = classroom.teachers.all()
+        teacher_profiles = Profile.objects.filter(user__in=teachers)
+
+        body = AdminProfileModelSerializer(teacher_profiles, many=True).data
+        return Response(data=body, status=status.HTTP_200_OK)
+
     @action(detail=False, permission_classes=[IsTeacher])
     def myclassrooms(self, request):
         classrooms = ClassRoom.objects.filter(teachers=request.user)
