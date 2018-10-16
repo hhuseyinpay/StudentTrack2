@@ -15,8 +15,8 @@ from .serializer import (
     ProfileModelSerializer, PClassSerializer, PGroupSerializer, \
     AdminProfileModelSerializer, AdminProfileCreateSerializer, AdminMakeStudentSeriazlier, \
     AdminChangeClassRoomSerializer, AdminChangeAreaSerializer, \
-    AdminClassroomTeacher, AdminClassroomSerializer, AdminAreaSeriazlier
-)
+    AdminClassroomTeacherSerializer, AdminClassroomSerializer, AdminAreaSeriazlier,
+    AdminAreaExcutiveSerializer)
 
 
 class UserLoginAPIView(views.ObtainAuthToken):
@@ -190,7 +190,7 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['put'])
     def addteacher(self, request, pk=None):
         classroom = self.get_object()
-        serializer = AdminClassroomTeacher(data=request.data)
+        serializer = AdminClassroomTeacherSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         classroom.teachers.add(user)
@@ -202,7 +202,7 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['put'])
     def removeteacher(self, request, pk=None):
         classroom = self.get_object()
-        serializer = AdminClassroomTeacher(data=request.data)
+        serializer = AdminClassroomTeacherSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         if user in classroom.teachers.all():
@@ -219,3 +219,28 @@ class AdminAreaViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Area.objects.filter(related_region=self.request.user.profile.related_region)
+
+    @action(detail=True, methods=['put'])
+    def addexecutive(self, request, pk=None):
+        area = self.get_object()
+        serializer = AdminAreaExcutiveSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        area.executives.add(user)
+        area.save()
+
+        body = self.get_serializer(area).data
+        return Response(data=body, status=status.HTTP_202_ACCEPTED)
+
+    @action(detail=True, methods=['put'])
+    def removeexecutive(self, request, pk=None):
+        area = self.get_object()
+        serializer = AdminAreaExcutiveSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        if user in area.executives.all():
+            area.executives.remove(user)
+            area.save()
+
+        body = self.get_serializer(area).data
+        return Response(data=body, status=status.HTTP_202_ACCEPTED)
