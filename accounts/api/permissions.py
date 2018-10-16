@@ -39,26 +39,16 @@ class IsTeacherExecutiveAdmin(permissions.BasePermission):
 
 
 def is_authority(authority_user, low_authority_profile):
+    authority_profile = authority_user.profile
     if authority_user == low_authority_profile.user:
         return True
-
-    if low_authority_profile.classroom \
-            and low_authority_profile.is_student \
-            and authority_user.profile.is_teacher \
-            and authority_user in low_authority_profile.classroom.teachers.all():
+    if authority_profile.is_teacher and \
+            low_authority_profile.classroom in ClassRoom.objects.filter(teachers=authority_user):
         return True
-
-    if low_authority_profile.related_area \
-            and not low_authority_profile.is_executive \
-            and not low_authority_profile.is_admin \
-            and authority_user.profile.is_executive \
-            and authority_user in low_authority_profile.related_area.executives.all():
+    if authority_profile.is_executive and \
+            low_authority_profile.related_area in Area.objects.filter(executives=authority_user):
         return True
-
-    if low_authority_profile.related_region \
-            and not low_authority_profile.is_admin \
-            and authority_user.profile.is_admin \
-            and authority_user in low_authority_profile.related_region.admin.all():
+    if authority_profile.is_admin and low_authority_profile.related_region == authority_profile.related_region:
         return True
     return False
 

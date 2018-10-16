@@ -12,9 +12,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from accounts.models import Profile, ClassRoom, Groups, Area, Region
 from .permissions import IsTeacherExecutiveAdmin, IsExecutiveAdmin, IsAdmin, IsTeacher, CanEditClassroom, CanEditProfile
 from .serializer import (
-    ProfileModelSerializer, PClassSerializer, PGroupSerializer, \
-    AdminProfileModelSerializer, AdminProfileCreateSerializer, AdminMakeStudentSeriazlier, \
-    AdminChangeClassRoomSerializer, AdminChangeAreaSerializer, \
+    ProfileModelSerializer, PClassSerializer, PGroupSerializer,
+    AdminProfileModelSerializer, AdminProfileCreateSerializer, AdminMakeStudentSeriazlier,
+    AdminChangeClassRoomSerializer, AdminChangeAreaSerializer,
     AdminClassroomTeacherSerializer, AdminClassroomSerializer, AdminAreaSeriazlier,
     AdminAreaExcutiveSerializer)
 
@@ -62,9 +62,9 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = AdminProfileCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        print(request.user.profile.related_region)
+
         serializer.save(created_by=request.user,
-                        related_region=request.user.profile.related_region)  # her yeni profil student olarak başlar
+                        related_region=request.user.profile.related_region)
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
@@ -188,9 +188,11 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.profile.is_executive:
-            return ClassRoom.objects.filter(related_area=self.request.user.profile.related_area)
+            areas = Area.objects.filter(executives=self.request.user)
+            return ClassRoom.objects.filter(related_area__in=areas)
         else:
-            return ClassRoom.objects.filter(related_area__related_region=self.request.user.profile.related_region)
+            region = Region.objects.filter(admins=self.request.user)
+            return ClassRoom.objects.filter(related_area__related_region__in=region)
 
     @action(detail=True, methods=['get'])
     def teachers(self, request, pk=None):
@@ -235,11 +237,14 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
 
 class AdminAreaViewset(viewsets.ModelViewSet):
     serializer_class = AdminAreaSeriazlier
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsExecutiveAdmin,)
 
     def get_queryset(self):
-        region = Region.objects.filter(admins=self.request.user)
-        return Area.objects.filter(related_region__in=region)
+        if self.request.user.profile.is_executive:
+            return Area.objects.filter(executives=self.request.user)
+        else:
+            region = Region.objects.filter(admins=self.request.user)
+            return Area.objects.filter(related_region__in=region)
 
     @action(detail=False)
     def allexecutives(self, request):
