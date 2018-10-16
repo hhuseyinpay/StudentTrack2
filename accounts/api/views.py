@@ -79,7 +79,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=[IsExecutiveAdmin])
     def myteachers(self, request):
         staff = request.user
-        qs = Profile.objects.filter(is_teacher=True, is_executive=False)
+        qs = Profile.objects.filter(is_teacher=True)
         if staff.profile.is_executive:
             teachers = qs.filter(related_area__executives=staff)
         else:
