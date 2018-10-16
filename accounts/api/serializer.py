@@ -1,11 +1,13 @@
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
+from rest_framework.validators import UniqueValidator
 
 from accounts.models import User, Profile, Groups, Region, Area, ClassRoom
 
 
 class UserModelSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(min_length=3, max_length=30)
+    username = serializers.CharField(min_length=3, max_length=30, validators=[
+        UniqueValidator(queryset=User.objects.all(), message="Bu kullanıcı Adı başkası tarafından alındı.")
+    ])
     first_name = serializers.CharField(min_length=2, max_length=50)
     last_name = serializers.CharField(min_length=2, max_length=30)
     password = serializers.CharField(write_only=True)
@@ -94,13 +96,6 @@ class AdminProfileModelSerializer(serializers.ModelSerializer):
         u = validated_data.pop('user')
         password = u.pop('password')
 
-        if User.objects.filter(username=u['username']).exists():
-            error = {
-                "error": {
-                    "username": "Bu kullanıcı Adı başkası tarafından alındı."
-                }
-            }
-            raise ValidationError(error)
         user = User(**u)  # new user create
         user.set_password(password)
         user.save()

@@ -10,12 +10,12 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 from accounts.models import Profile, ClassRoom, Groups, Area, Region
-from .permissions import IsTeacherExecutiveAdmin, IsExecutiveAdmin, IsAdmin, IsTeacher
+from .permissions import IsTeacherExecutiveAdmin, IsExecutiveAdmin, IsAdmin, IsTeacher, CanEditClassroom, CanEditProfile
 from .serializer import (
     ProfileModelSerializer, PClassSerializer, PGroupSerializer, \
     AdminProfileModelSerializer, AdminProfileCreateSerializer, AdminMakeStudentSeriazlier, \
     AdminChangeClassRoomSerializer, AdminChangeAreaSerializer, \
-    AdminClassroomSerializer, AdminAreaSeriazlier
+    AdminClassroomTeacher, AdminClassroomSerializer, AdminAreaSeriazlier
 )
 
 
@@ -54,7 +54,7 @@ class AdminGroupList(generics.ListAPIView):
 
 class AdminProfileViewSet(viewsets.ModelViewSet):
     serializer_class = AdminProfileModelSerializer
-    permission_classes = (IsAuthenticated, IsTeacherExecutiveAdmin)
+    permission_classes = (IsAuthenticated, CanEditProfile)
     queryset = Profile.objects.all()
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filter_fields = ('is_student', 'is_teacher', 'is_executive', 'classroom', 'related_area', 'related_region')
@@ -66,21 +66,6 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         serializer.save(created_by=request.user,
                         related_region=request.user.profile.related_region)  # her yeni profil student olarak başlar
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-
-    def has_object_permission(self, request, view, obj):
-        admin_user = request.user
-        if admin_user == obj.user:
-            return True
-        if admin_user.profile.is_teacher and obj.is_student:
-            if obj.classroom in ClassRoom.objects.filter(teachers=admin_user):
-                return True
-        if admin_user.profile.is_executive and not obj.is_executive and not obj.is_admin:
-            if obj.related_area in Area.objects.filter(executives=admin_user):
-                return True
-        elif admin_user.profile.is_admin and not obj.is_admin:
-            if obj.related_region in Region.objects.filter(admins=admin_user):
-                return True
-        return False
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -102,11 +87,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         if classroom not in ClassRoom.objects.filter(teachers=request.user) and \
                 classroom.related_area not in Area.objects.filter(Q(executives=request.user) |
                                                                   Q(related_region__admins=request.user)):
-            body = {
-                "error": {
-                    "classroom": "You have not authority on this classroom"
-                }
-            }
+            body = {"classroom": "You have not authority on this classroom"}
             return Response(data=body, status=status.HTTP_400_BAD_REQUEST)
 
         profile.group = group
@@ -155,11 +136,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         else:
             if classroom.related_area not in Area.objects.filter(Q(executives=request.user) |
                                                                  Q(related_region__admins=request.user)):
-                body = {
-                    "error": {
-                        "classroom": "You have not authority on this classroom"
-                    }
-                }
+                body = {"classroom": "You have not authority on this classroom"}
                 return Response(data=body, status=status.HTTP_400_BAD_REQUEST)
             profile.classroom = classroom
             profile.related_area = classroom.related_area
@@ -181,11 +158,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
             profile.related_area = None
         else:
             if related_area.related_region not in Region.objects.filter(admins=request.user):
-                body = {
-                    "error": {
-                        "area": "You have not authority on this area"
-                    }
-                }
+                body = {"area": "You have not authority on this area"}
                 return Response(data=body, status=status.HTTP_400_BAD_REQUEST)
 
             profile.related_area = related_area
@@ -200,7 +173,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
 
 class AdminClassroomViewSet(viewsets.ModelViewSet):
     serializer_class = AdminClassroomSerializer
-    permission_classes = (IsExecutiveAdmin,)
+    permission_classes = (CanEditClassroom,)
 
     def get_queryset(self):
         if self.request.user.profile.is_executive:
