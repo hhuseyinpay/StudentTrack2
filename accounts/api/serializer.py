@@ -157,6 +157,10 @@ class AdminChangeAreaSerializer(serializers.Serializer):
     related_area = serializers.PrimaryKeyRelatedField(required=False, queryset=ClassRoom.objects.all())
 
 
+class AdminClassroomTeacher(serializers.Serializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(profile__is_teacher=True))
+
+
 class AdminClassroomSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassRoom

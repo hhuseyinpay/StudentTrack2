@@ -214,6 +214,31 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
         serializer = PClassSerializer(classrooms, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['put'])
+    def addteacher(self, request, pk=None):
+        classroom = self.get_object()
+        serializer = AdminClassroomTeacher(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        classroom.teachers.add(user)
+        classroom.save()
+
+        body = self.get_serializer(classroom).data
+        return Response(data=body, status=status.HTTP_202_ACCEPTED)
+
+    @action(detail=True, methods=['put'])
+    def removeteacher(self, request, pk=None):
+        classroom = self.get_object()
+        serializer = AdminClassroomTeacher(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        if user in classroom.teachers.all():
+            classroom.teachers.remove(user)
+            classroom.save()
+
+        body = self.get_serializer(classroom).data
+        return Response(data=body, status=status.HTTP_202_ACCEPTED)
+
 
 class AdminAreaViewset(viewsets.ModelViewSet):
     serializer_class = AdminAreaSeriazlier
