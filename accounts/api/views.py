@@ -238,7 +238,29 @@ class AdminAreaViewset(viewsets.ModelViewSet):
     permission_classes = (IsAdmin,)
 
     def get_queryset(self):
-        return Area.objects.filter(related_region=self.request.user.profile.related_region)
+        region = Region.objects.filter(admins=self.request.user)
+        return Area.objects.filter(related_region__in=region)
+
+    @action(detail=False)
+    def allexecutives(self, request):
+        region = request.user.profile.related_region
+        areas = Area.objects.filter(related_region=region)
+        executives = Area.objects.none()
+        for a in areas:
+            executives = executives | a.executives.all()
+        executive_profiles = Profile.objects.filter(user__in=executives)
+
+        body = AdminProfileModelSerializer(executive_profiles, many=True).data
+        return Response(data=body, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['get'])
+    def executives(self, request, pk=None):
+        area = self.get_object()
+        executives = area.executives.all()
+        executive_profiles = Profile.objects.filter(user__in=executives)
+
+        body = AdminProfileModelSerializer(executive_profiles, many=True).data
+        return Response(data=body, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'])
     def addexecutive(self, request, pk=None):
