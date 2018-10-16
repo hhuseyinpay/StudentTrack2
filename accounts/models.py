@@ -10,7 +10,7 @@ class Region(models.Model):
     name = models.TextField(unique=True)
     description = models.TextField(blank=True)
 
-    admins = models.ManyToManyField(User, related_name='region_admins')
+    admins = models.ManyToManyField(User, related_name='region_admins', blank=True)
 
     def __str__(self):
         return self.name
@@ -20,7 +20,7 @@ class Area(models.Model):
     name = models.TextField(unique=True)
     description = models.TextField(blank=True)
 
-    executives = models.ManyToManyField(User, related_name='area_executives')
+    executives = models.ManyToManyField(User, related_name='area_executives', blank=True)
     related_region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -31,7 +31,7 @@ class ClassRoom(models.Model):
     name = models.TextField()
     description = models.TextField(blank=True)
 
-    teachers = models.ManyToManyField(User, related_name='classroom_teachers')
+    teachers = models.ManyToManyField(User, related_name='classroom_teachers', blank=True)
     related_area = models.ForeignKey(Area, on_delete=models.CASCADE)
 
     def __str__(self):
