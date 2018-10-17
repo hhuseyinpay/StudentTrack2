@@ -21,7 +21,7 @@ class Area(models.Model):
     description = models.TextField(blank=True)
 
     executives = models.ManyToManyField(User, related_name='area_executives', blank=True)
-    related_region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -32,7 +32,7 @@ class ClassRoom(models.Model):
     description = models.TextField(blank=True)
 
     teachers = models.ManyToManyField(User, related_name='classroom_teachers', blank=True)
-    related_area = models.ForeignKey(Area, on_delete=models.CASCADE)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -62,8 +62,6 @@ class Profile(models.Model):
     joined_date = models.DateField(default=now)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True)
     classroom = models.ForeignKey(ClassRoom, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    related_area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    related_region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
     is_student = models.BooleanField(default=False)
     is_teacher = models.BooleanField(default=False)

@@ -6,14 +6,14 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from accounts.models import Profile, ClassRoom, Groups, Area, Region
+from accounts.models import User, Profile, ClassRoom, Groups, Area, Region
 from .permissions import IsTeacherExecutiveAdmin, IsExecutiveAdmin, IsAdmin, CanEditClassroom, CanEditProfile
 from .serializer import (
-    ProfileModelSerializer, PClassSerializer, PGroupSerializer,
-    AdminProfileModelSerializer, AdminProfileCreateSerializer, AdminMakeStudentSeriazlier,
+    ProfileModelSerializer, ClassRoomModelSerializer, GroupSerializer,
+    AdminProfileSerializer, AdminMakeStudentSeriazlier,
     AdminChangeClassRoomSerializer, AdminChangeAreaSerializer,
     AdminClassroomTeacherSerializer, AdminClassroomSerializer, AdminAreaSeriazlier,
-    AdminAreaExcutiveSerializer, PAreaSerializer)
+    AdminAreaExcutiveSerializer, AreaModelSerializer, MyClassRoomSerializer, MyAreaSerializer)
 
 
 class UserLoginAPIView(views.ObtainAuthToken):
@@ -44,44 +44,32 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.
 
 
 class AdminGroupList(generics.ListAPIView):
-    serializer_class = PGroupSerializer
+    serializer_class = GroupSerializer
     # permission_classes = (IsAuthenticated, IsTeExAd)
     queryset = Groups.objects.all()
 
 
 class AdminProfileViewSet(viewsets.ModelViewSet):
-    serializer_class = AdminProfileModelSerializer
+    serializer_class = ProfileModelSerializer
     permission_classes = (IsAuthenticated, CanEditProfile)
     queryset = Profile.objects.all()
-    filter_fields = ('is_student', 'is_teacher', 'is_executive', 'classroom', 'related_area', 'related_region')
+    filter_fields = ('is_student', 'is_teacher', 'is_executive', 'classroom')
 
     def create(self, request, *args, **kwargs):
-        serializer = AdminProfileCreateSerializer(data=request.data)
+        serializer = AdminProfileSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        serializer.save(created_by=request.user,
-                        related_region=request.user.profile.related_region)
+        serializer.save(created_by=request.user, is_student=True)
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = AdminProfileCreateSerializer(instance, data=request.data, partial=True)
+        serializer = AdminProfileSerializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
         body = self.get_serializer(instance).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
-
-    @action(detail=False, permission_classes=[IsExecutiveAdmin])
-    def myteachers(self, request):
-        staff = request.user
-        qs = Profile.objects.filter(is_teacher=True)
-        if staff.profile.is_executive:
-            teachers = qs.filter(related_area__executives=staff)
-        else:
-            teachers = qs.filter(related_region__admins=staff)
-        serializer = AdminProfileModelSerializer(teachers, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'], permission_classes=[IsTeacherExecutiveAdmin])
     def makestudent(self, request, pk=None):
@@ -91,16 +79,15 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         classroom = serializer.validated_data['classroom']
         group = serializer.validated_data['group']
 
+        # optimize edilebilir?
         if classroom not in ClassRoom.objects.filter(teachers=request.user) and \
-                classroom.related_area not in Area.objects.filter(Q(executives=request.user) |
-                                                                  Q(related_region__admins=request.user)):
+                classroom.area not in Area.objects.filter(executives=request.user) and \
+                classroom.area.region not in Region.objects.filter(admins=request.user):
             body = {"classroom": "You have not authority on this classroom"}
             return Response(data=body, status=status.HTTP_400_BAD_REQUEST)
 
         profile.group = group
         profile.classroom = classroom
-        profile.related_area = classroom.related_area
-        profile.related_region = classroom.related_area.related_region
         profile.is_student = True
         profile.is_teacher = False
         profile.is_executive = False
@@ -112,7 +99,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['put'], permission_classes=[IsExecutiveAdmin])
     def maketeacher(self, request, pk=None):
         profile = self.get_object()
-
+        profile.classroom = None
         profile.is_student = False
         profile.is_teacher = True
         profile.save()
@@ -123,7 +110,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['put'], permission_classes=[IsAdmin])
     def makeexecutive(self, request, pk=None):
         profile = self.get_object()
-
+        profile.classroom = None
         profile.is_student = False
         profile.is_executive = True
         profile.save()
@@ -131,7 +118,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         body = self.get_serializer(profile).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
-    @action(detail=True, methods=['put'], permission_classes=[IsExecutiveAdmin])
+    @action(detail=True, methods=['put'], permission_classes=[IsTeacherExecutiveAdmin])
     def changeclassroom(self, request, pk=None):
         profile = self.get_object()
         seriazlier = AdminChangeClassRoomSerializer(request.data)
@@ -141,37 +128,12 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         if not classroom:
             profile.classroom = None
         else:
-            if classroom.related_area not in Area.objects.filter(Q(executives=request.user) |
-                                                                 Q(related_region__admins=request.user)):
+            if classroom.area not in Area.objects.filter(Q(executives=request.user) |
+                                                         Q(region__admins=request.user)):
                 body = {"classroom": "You have not authority on this classroom"}
                 return Response(data=body, status=status.HTTP_400_BAD_REQUEST)
             profile.classroom = classroom
-            profile.related_area = classroom.related_area
-            profile.related_region = classroom.related_area.related_region
 
-        profile.save()
-
-        body = self.get_serializer(profile).data
-        return Response(data=body, status=status.HTTP_202_ACCEPTED)
-
-    @action(detail=True, methods=['put'], permission_classes=[IsExecutiveAdmin])
-    def changearea(self, request, pk=None):
-        profile = self.get_object()
-        seriazlier = AdminChangeAreaSerializer(request.data)
-        seriazlier.is_valid(raise_exception=True)
-        related_area = seriazlier.validated_data['related_area']  # class none yapılabilir.
-
-        if not related_area:
-            profile.related_area = None
-        else:
-            if related_area.related_region not in Region.objects.filter(admins=request.user):
-                body = {"area": "You have not authority on this area"}
-                return Response(data=body, status=status.HTTP_400_BAD_REQUEST)
-
-            profile.related_area = related_area
-            profile.related_region = related_area.related_region
-
-        profile.classroom = None
         profile.save()
 
         body = self.get_serializer(profile).data
@@ -185,10 +147,23 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.request.user.profile.is_executive:
             areas = Area.objects.filter(executives=self.request.user)
-            return ClassRoom.objects.filter(related_area__in=areas)
+            return ClassRoom.objects.filter(area__in=areas)
         else:
             region = Region.objects.filter(admins=self.request.user)
-            return ClassRoom.objects.filter(related_area__related_region__in=region)
+            return ClassRoom.objects.filter(area__region__in=region)
+
+    def retrieve(self, request, *args, **kwargs):
+        classroom = self.get_object()
+
+        body = ClassRoomModelSerializer(classroom).data
+        return Response(body, status=status.HTTP_200_OK)
+
+    @action(detail=False, permission_classes=[IsTeacherExecutiveAdmin])
+    def myclassrooms(self, request):
+        classrooms = ClassRoom.objects.filter(teachers=request.user)
+
+        body = MyClassRoomSerializer(classrooms, many=True).data
+        return Response(body, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def teachers(self, request, pk=None):
@@ -196,17 +171,10 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
         teachers = classroom.teachers.all()
         teacher_profiles = Profile.objects.filter(user__in=teachers)
 
-        body = AdminProfileModelSerializer(teacher_profiles, many=True).data
+        body = ProfileModelSerializer(teacher_profiles, many=True).data
         return Response(data=body, status=status.HTTP_200_OK)
 
-    @action(detail=False, permission_classes=[IsTeacherExecutiveAdmin])
-    def myclassrooms(self, request):
-        classrooms = ClassRoom.objects.filter(teachers=request.user)
-
-        body = PClassSerializer(classrooms, many=True).data
-        return Response(body, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['put'])
+    @action(detail=True, methods=['put'], permission_classes=[CanEditClassroom])
     def addteacher(self, request, pk=None):
         classroom = self.get_object()
         serializer = AdminClassroomTeacherSerializer(data=request.data)
@@ -218,7 +186,7 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
         body = self.get_serializer(classroom).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
-    @action(detail=True, methods=['put'])
+    @action(detail=True, methods=['put'], permission_classes=[CanEditClassroom])
     def removeteacher(self, request, pk=None):
         classroom = self.get_object()
         serializer = AdminClassroomTeacherSerializer(data=request.data)
@@ -241,18 +209,25 @@ class AdminAreaViewset(viewsets.ModelViewSet):
             return Area.objects.filter(executives=self.request.user)
         else:
             region = Region.objects.filter(admins=self.request.user)
-            return Area.objects.filter(related_region__in=region)
+            return Area.objects.filter(region__in=region)
 
-    @action(detail=False)
+    @action(detail=False, permission_classes=[IsExecutiveAdmin])
+    def myareas(self, request):
+        areas = Area.objects.filter(executives=request.user)
+
+        body = MyAreaSerializer(areas, many=True).data
+        return Response(body, status=status.HTTP_200_OK)
+
+    @action(detail=False, permission_classes=[IsAdmin])
     def allexecutives(self, request):
-        region = request.user.profile.related_region
-        areas = Area.objects.filter(related_region=region)
+        regions = Region.objects.filter(admins=request.user)
+        areas = Area.objects.filter(region__in=regions)
         executives = Area.objects.none()
         for a in areas:
             executives = executives | a.executives.all()
         executive_profiles = Profile.objects.filter(user__in=executives)
 
-        body = AdminProfileModelSerializer(executive_profiles, many=True).data
+        body = ProfileModelSerializer(executive_profiles, many=True).data
         return Response(data=body, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
@@ -261,15 +236,20 @@ class AdminAreaViewset(viewsets.ModelViewSet):
         executives = area.executives.all()
         executive_profiles = Profile.objects.filter(user__in=executives)
 
-        body = AdminProfileModelSerializer(executive_profiles, many=True).data
+        body = ProfileModelSerializer(executive_profiles, many=True).data
         return Response(data=body, status=status.HTTP_200_OK)
 
-    @action(detail=False, permission_classes=[IsExecutiveAdmin])
-    def myareas(self, request):
-        areas = Area.objects.filter(executives=request.user)
+    @action(detail=True, methods=['get'])
+    def teachers(self, request, pk=None):
+        area = self.get_object()
+        classrooms = ClassRoom.objects.filter(area=area)
+        teachers = User.objects.none()
+        for c in classrooms:
+            teachers = teachers | c.teachers.all()
+        teacher_profiles = Profile.objects.filter(user__in=teachers)
 
-        body = PAreaSerializer(areas, many=True).data
-        return Response(body, status=status.HTTP_200_OK)
+        body = ProfileModelSerializer(teacher_profiles)
+        return Response(data=body, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'])
     def addexecutive(self, request, pk=None):

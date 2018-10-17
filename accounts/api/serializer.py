@@ -17,79 +17,61 @@ class UserModelSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'password', 'first_name', 'last_name')
 
 
-# *********************************************
-
-class PClassSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ClassRoom
-        fields = ('id', 'name')
-
-
-class PAreaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Area
-        fields = ('id', 'name')
-
-
-class PRegionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Region
-        fields = ('id', 'name')
-
-
-class PGroupSerializer(serializers.ModelSerializer):
+class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Groups
         fields = ('id', 'name', 'description')
 
 
+# *********************************************
+
+class RegionModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Region
+        fields = '__all__'
+
+
+class AreaModelSerializer(serializers.ModelSerializer):
+    region = RegionModelSerializer()
+
+    class Meta:
+        model = Area
+        fields = '__all__'
+
+
+class ClassRoomModelSerializer(serializers.ModelSerializer):
+    area = AreaModelSerializer()
+
+    class Meta:
+        model = ClassRoom
+        fields = '__all__'
+
+
+class MyAreaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Area
+        fields = ('id', 'name')
+
+
+class MyClassRoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClassRoom
+        fields = ('id', 'name')
+
+
+# ***********************************************
 class ProfileModelSerializer(serializers.ModelSerializer):
     user = UserModelSerializer()
-    classroom = PClassSerializer(read_only=True)
-    related_area = PAreaSerializer(read_only=True)
-    related_region = PRegionSerializer(read_only=True)
-
-    group = PGroupSerializer(read_only=True)
+    group = GroupSerializer()
 
     class Meta:
         model = Profile
         fields = (
-            'id', 'user', 'phone_number', 'joined_date', 'group', 'classroom', 'related_area', 'related_region',
-            'is_student', 'is_teacher', 'is_executive', 'is_admin'
-        )
-        read_only_fields = ('joined_date', 'is_student', 'is_teacher', 'is_executive', 'is_admin',)
-
-    def update(self, instance, validated_data):
-        validated_user = validated_data.get('user')
-        if validated_user:
-            u = User.objects.get(profile=instance)
-            u.username = validated_user.get('username', u.username)
-            if validated_user.get('password', None):
-                u.set_password(validated_user.get('password'))
-
-            u.first_name = validated_user.get('first_name', u.first_name)
-            u.last_name = validated_user.get('last_name', u.last_name)
-            u.save()
-        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
-        instance.save()
-        return instance
-
-
-class AdminProfileModelSerializer(serializers.ModelSerializer):
-    user = UserModelSerializer()
-    classroom = PClassSerializer()
-    related_area = PAreaSerializer()
-    related_region = PRegionSerializer()
-    group = PGroupSerializer()
-
-    class Meta:
-        model = Profile
-        fields = (
-            'id', 'user', 'phone_number', 'joined_date', 'group', 'classroom', 'related_area', 'related_region',
+            'id', 'user', 'phone_number', 'joined_date', 'group', 'classroom',
             'is_student', 'is_teacher', 'is_executive', 'is_admin'
         )
         read_only_fields = (
-            'is_student', 'is_teacher', 'is_executive', 'is_admin', 'classroom', 'related_area', 'related_region'
+            'is_student', 'is_teacher', 'is_executive', 'is_admin', 'classroom',
         )
 
     def create(self, validated_data):
@@ -124,17 +106,17 @@ class AdminProfileModelSerializer(serializers.ModelSerializer):
         # instance.is_admin = validated_data.get('is_admin', instance.admin)
 
         instance.classroom = validated_data.get('classroom', instance.classroom)
-        instance.related_area = validated_data.get('related_area', instance.related_area)
-        instance.related_region = validated_data.get('related_region', instance.related_region)
 
         instance.save()
         return instance
 
 
-class AdminProfileCreateSerializer(AdminProfileModelSerializer):
-    classroom = serializers.PrimaryKeyRelatedField(read_only=True)
-    related_area = serializers.PrimaryKeyRelatedField(read_only=True)
-    related_region = serializers.PrimaryKeyRelatedField(read_only=True)
+class StudentProfileSerializer(ProfileModelSerializer):
+    group = GroupSerializer(read_only=True)
+    joined_date = serializers.DateField(read_only=True)
+
+
+class AdminProfileSerializer(ProfileModelSerializer):
     group = serializers.PrimaryKeyRelatedField(required=False, queryset=Groups.objects.all())
     joined_date = serializers.DateField(required=True)
 
@@ -149,7 +131,7 @@ class AdminChangeClassRoomSerializer(serializers.Serializer):
 
 
 class AdminChangeAreaSerializer(serializers.Serializer):
-    related_area = serializers.PrimaryKeyRelatedField(required=False, queryset=ClassRoom.objects.all())
+    area = serializers.PrimaryKeyRelatedField(required=False, queryset=ClassRoom.objects.all())
 
 
 class AdminClassroomTeacherSerializer(serializers.Serializer):

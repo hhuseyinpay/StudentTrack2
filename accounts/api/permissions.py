@@ -46,37 +46,36 @@ def is_authority(authority_user, low_authority_profile):
             low_authority_profile.classroom in ClassRoom.objects.filter(teachers=authority_user):
         return True
     if authority_profile.is_executive and \
-            low_authority_profile.related_area in Area.objects.filter(executives=authority_user):
+            low_authority_profile.classroom.area in Area.objects.filter(executives=authority_user):
         return True
-    if authority_profile.is_admin and low_authority_profile.related_region == authority_profile.related_region:
+    if authority_profile.is_admin and \
+            low_authority_profile.classroom.area.region in Region.objects.filter(admins=authority_user):
         return True
     return False
 
 
 class CanEditProfile(IsTeacherExecutiveAdmin):
     def has_object_permission(self, request, view, obj):
-        admin_user = request.user
-        if admin_user == obj.user:
+        staff = request.user
+        if staff == obj.user:
             return True
-        if admin_user.profile.is_teacher and obj.is_student:
-            if obj.classroom in ClassRoom.objects.filter(teachers=admin_user):
+        if staff.profile.is_teacher and obj.is_student:
+            if obj.classroom in ClassRoom.objects.filter(teachers=staff):
                 return True
-        if admin_user.profile.is_executive and not obj.is_executive and not obj.is_admin:
-            if obj.related_area in Area.objects.filter(executives=admin_user):
+        if staff.profile.is_executive and not obj.is_executive and not obj.is_admin:
+            if obj.classroom.area in Area.objects.filter(executives=staff):
                 return True
-        elif admin_user.profile.is_admin and not obj.is_admin:
-            if obj.related_region in Region.objects.filter(admins=admin_user):
+        elif staff.profile.is_admin and not obj.is_admin:
+            if obj.classroom.area.region in Region.objects.filter(admins=staff):
                 return True
         return False
 
 
 class CanEditClassroom(IsExecutiveAdmin):
     def has_object_permission(self, request, view, obj):
-        admin_user = request.user
-        if admin_user.profile.is_executive and admin_user in obj.related_area.executives.all():
+        staff = request.user
+        if staff.profile.is_executive and staff in obj.area.executives.all():
             return True
-        if admin_user.profile.is_admin and admin_user.profile.related_region == obj.related_area.related_region:
-            return True
-        if admin_user in obj.teachers.all():
+        if staff.profile.is_admin and staff in obj.area.region.admins.all():
             return True
         return False
