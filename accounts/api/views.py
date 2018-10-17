@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from accounts.models import Profile, ClassRoom, Groups, Area, Region
-from .permissions import IsTeacherExecutiveAdmin, IsExecutiveAdmin, IsAdmin, IsTeacher, CanEditClassroom, CanEditProfile
+from .permissions import IsTeacherExecutiveAdmin, IsExecutiveAdmin, IsAdmin, CanEditClassroom, CanEditProfile
 from .serializer import (
     ProfileModelSerializer, PClassSerializer, PGroupSerializer,
     AdminProfileModelSerializer, AdminProfileCreateSerializer, AdminMakeStudentSeriazlier,
@@ -199,7 +199,7 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
         body = AdminProfileModelSerializer(teacher_profiles, many=True).data
         return Response(data=body, status=status.HTTP_200_OK)
 
-    @action(detail=False, permission_classes=[IsTeacher])
+    @action(detail=False, permission_classes=[IsTeacherExecutiveAdmin])
     def myclassrooms(self, request):
         classrooms = ClassRoom.objects.filter(teachers=request.user)
 
