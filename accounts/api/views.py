@@ -266,10 +266,7 @@ class AdminAreaViewset(viewsets.ModelViewSet):
 
     @action(detail=False, permission_classes=[IsExecutiveAdmin])
     def myareas(self, request):
-        if request.user.profile.is_executive:
-            areas = Area.objects.filter(executives=request.user)
-        else:
-            areas = Area.objects.filter(related_region__admins=request.user)
+        areas = Area.objects.filter(executives=request.user)
 
         body = PAreaSerializer(areas, many=True).data
         return Response(body, status=status.HTTP_200_OK)
