@@ -6,9 +6,6 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from rest_framework import filters
-from django_filters.rest_framework import DjangoFilterBackend
-
 from accounts.models import Profile, ClassRoom, Groups, Area, Region
 from .permissions import IsTeacherExecutiveAdmin, IsExecutiveAdmin, IsAdmin, IsTeacher, CanEditClassroom, CanEditProfile
 from .serializer import (
@@ -56,7 +53,6 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     serializer_class = AdminProfileModelSerializer
     permission_classes = (IsAuthenticated, CanEditProfile)
     queryset = Profile.objects.all()
-    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filter_fields = ('is_student', 'is_teacher', 'is_executive', 'classroom', 'related_area', 'related_region')
 
     def create(self, request, *args, **kwargs):
