@@ -13,7 +13,7 @@ from .serializer import (
     AdminProfileModelSerializer, AdminProfileCreateSerializer, AdminMakeStudentSeriazlier,
     AdminChangeClassRoomSerializer, AdminChangeAreaSerializer,
     AdminClassroomTeacherSerializer, AdminClassroomSerializer, AdminAreaSeriazlier,
-    AdminAreaExcutiveSerializer)
+    AdminAreaExcutiveSerializer, PAreaSerializer)
 
 
 class UserLoginAPIView(views.ObtainAuthToken):
@@ -202,8 +202,9 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=[IsTeacher])
     def myclassrooms(self, request):
         classrooms = ClassRoom.objects.filter(teachers=request.user)
-        serializer = PClassSerializer(classrooms, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        body = PClassSerializer(classrooms, many=True).data
+        return Response(body, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'])
     def addteacher(self, request, pk=None):
@@ -262,6 +263,16 @@ class AdminAreaViewset(viewsets.ModelViewSet):
 
         body = AdminProfileModelSerializer(executive_profiles, many=True).data
         return Response(data=body, status=status.HTTP_200_OK)
+
+    @action(detail=False, permission_classes=[IsExecutiveAdmin])
+    def myareas(self, request):
+        if request.user.profile.is_executive:
+            areas = Area.objects.filter(executives=request.user)
+        else:
+            areas = Area.objects.filter(related_region__admins=request.user)
+
+        body = PAreaSerializer(areas, many=True).data
+        return Response(body, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'])
     def addexecutive(self, request, pk=None):
