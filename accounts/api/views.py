@@ -13,7 +13,7 @@ from .serializer import (
     AdminProfileSerializer, AdminMakeStudentSeriazlier,
     AdminChangeClassRoomSerializer, AdminChangeAreaSerializer,
     AdminClassroomTeacherSerializer, AdminClassroomSerializer, AdminAreaSeriazlier,
-    AdminAreaExcutiveSerializer, AreaModelSerializer, MyClassRoomSerializer, MyAreaSerializer)
+    AdminAreaExcutiveSerializer, AreaModelSerializer, MyClassRoomSerializer, MyAreaSerializer, StudentProfileSerializer)
 
 
 class UserLoginAPIView(views.ObtainAuthToken):
@@ -36,12 +36,19 @@ class ListAllProfileAPIView(generics.ListAPIView):
 
 class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin,
                      viewsets.GenericViewSet):
-    serializer_class = ProfileModelSerializer
+    serializer_class = StudentProfileSerializer
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return Profile.objects.filter(id=self.request.user.profile.id)
 
+
+class ClassRoomRetrieveAPIView(generics.RetrieveAPIView):
+    serializer_class = ClassRoomModelSerializer
+    queryset = ClassRoom.objects.all()
+
+
+# **************************************************
 
 class AdminGroupList(generics.ListAPIView):
     serializer_class = GroupSerializer
@@ -99,6 +106,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['put'], permission_classes=[IsExecutiveAdmin])
     def maketeacher(self, request, pk=None):
         profile = self.get_object()
+        profile.group = None
         profile.classroom = None
         profile.is_student = False
         profile.is_teacher = True
@@ -110,6 +118,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['put'], permission_classes=[IsAdmin])
     def makeexecutive(self, request, pk=None):
         profile = self.get_object()
+        profile.group = None
         profile.classroom = None
         profile.is_student = False
         profile.is_executive = True
@@ -121,7 +130,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['put'], permission_classes=[IsTeacherExecutiveAdmin])
     def changeclassroom(self, request, pk=None):
         profile = self.get_object()
-        seriazlier = AdminChangeClassRoomSerializer(request.data)
+        seriazlier = AdminChangeClassRoomSerializer(data=request.data)
         seriazlier.is_valid(raise_exception=True)
         classroom = seriazlier.validated_data['classroom']  # class none yapılabilir.
 
@@ -151,12 +160,6 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
         else:
             region = Region.objects.filter(admins=self.request.user)
             return ClassRoom.objects.filter(area__region__in=region)
-
-    def retrieve(self, request, *args, **kwargs):
-        classroom = self.get_object()
-
-        body = ClassRoomModelSerializer(classroom).data
-        return Response(body, status=status.HTTP_200_OK)
 
     @action(detail=False, permission_classes=[IsTeacherExecutiveAdmin])
     def myclassrooms(self, request):

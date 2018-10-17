@@ -32,19 +32,19 @@ class RegionModelSerializer(serializers.ModelSerializer):
 
 
 class AreaModelSerializer(serializers.ModelSerializer):
-    region = RegionModelSerializer()
-
     class Meta:
         model = Area
         fields = '__all__'
 
+    region = RegionModelSerializer()
+
 
 class ClassRoomModelSerializer(serializers.ModelSerializer):
-    area = AreaModelSerializer()
-
     class Meta:
         model = ClassRoom
         fields = '__all__'
+
+    area = AreaModelSerializer()
 
 
 class MyAreaSerializer(serializers.ModelSerializer):
@@ -71,7 +71,7 @@ class ProfileModelSerializer(serializers.ModelSerializer):
             'is_student', 'is_teacher', 'is_executive', 'is_admin'
         )
         read_only_fields = (
-            'is_student', 'is_teacher', 'is_executive', 'is_admin', 'classroom',
+            'is_student', 'is_teacher', 'is_executive', 'is_admin',
         )
 
     def create(self, validated_data):
@@ -81,7 +81,8 @@ class ProfileModelSerializer(serializers.ModelSerializer):
         user = User(**u)  # new user create
         user.set_password(password)
         user.save()
-
+        for i, v in validated_data.items():
+            print("    ", i, ": ", v)
         return Profile.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
@@ -112,6 +113,7 @@ class ProfileModelSerializer(serializers.ModelSerializer):
 
 
 class StudentProfileSerializer(ProfileModelSerializer):
+    classroom = serializers.PrimaryKeyRelatedField(required=True, queryset=ClassRoom.objects.all())
     group = GroupSerializer(read_only=True)
     joined_date = serializers.DateField(read_only=True)
 
