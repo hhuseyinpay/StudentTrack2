@@ -1,15 +1,28 @@
 from django.contrib.auth.models import User
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.exceptions import NotFound
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 
+from accounts.api.permissions import IsAdmin, IsTeacherExecutiveAdmin
 from base.models import Course, Groups
 from .serializer import GroupCourseModelSerializer, GroupSerializer
 
 
+class GroupViewset(viewsets.ModelViewSet):
+    serializer_class = GroupSerializer
+    queryset = Groups.objects.filter()
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            permission_classes = [IsAdmin]
+        else:
+            # which is permissions.AllowAny
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
+
+
 class UserGroupCourseListAPIView(generics.ListAPIView):
     serializer_class = GroupCourseModelSerializer
-    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
 
@@ -27,5 +40,4 @@ class UserGroupCourseListAPIView(generics.ListAPIView):
 
 class GroupListAPIView(generics.ListAPIView):
     serializer_class = GroupSerializer
-    # permission_classes = (IsAuthenticated, IsTeExAd)
     queryset = Groups.objects.all()
