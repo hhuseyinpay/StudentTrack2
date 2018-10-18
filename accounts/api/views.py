@@ -34,13 +34,19 @@ class ListAllProfileAPIView(generics.ListAPIView):
         return Profile.objects.all()
 
 
-class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin,
-                     viewsets.GenericViewSet):
+class ProfileViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     serializer_class = StudentProfileSerializer
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return Profile.objects.filter(id=self.request.user.profile.id)
+
+    @action(detail=False, permission_classes=[IsAuthenticated])
+    def me(self, request):
+        qs = self.get_queryset()
+
+        body = self.get_serializer(qs.first()).data
+        return Response(data=body, status=status.HTTP_200_OK)
 
 
 class ClassRoomRetrieveAPIView(generics.RetrieveAPIView):
