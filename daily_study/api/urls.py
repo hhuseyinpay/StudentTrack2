@@ -3,15 +3,13 @@ from django.urls import path
 # from rest_framework.routers import DefaultRouter
 
 from .views import DSListCreateAPIView, DSRetrieveUpdateAPIView, DSIntervalListAPIView, \
-    GroupCourseListAPIView, AdminDSRetrieveUpdateAPIView, AdminDSValidateAPIView, AdminDSClassroomListAPIView, \
-    AdminDsRetrieveUserDayAPIView, UserGroupCourseListAPIView, AdminDSIntervalListAPIView, AdminDSNotvalidatedAPIView
+    AdminDSRetrieveUpdateAPIView, AdminDSValidateAPIView, AdminDSClassroomListAPIView, \
+    AdminDsRetrieveUserDayAPIView, AdminDSIntervalListAPIView, AdminDSNotvalidatedAPIView
 
 # router = DefaultRouter()
 # router.register('ceteles', CeteleViewSet, base_name="ceteles")
 
 urlpatterns = [
-    path('courses/', GroupCourseListAPIView.as_view()),
-    path('courses/user/<int:user>/', UserGroupCourseListAPIView.as_view()),
     # api/daily_study/
     path('me/', DSListCreateAPIView.as_view(), name="user-daily_study-list-create"),
 

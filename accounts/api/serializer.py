@@ -17,12 +17,6 @@ class UserModelSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'password', 'first_name', 'last_name')
 
 
-class GroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Groups
-        fields = ('id', 'name', 'description')
-
-
 # *********************************************
 
 class RegionModelSerializer(serializers.ModelSerializer):

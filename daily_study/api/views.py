@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, NotFound
 
 from daily_study.models import DailyStudy, Course
-from .serializer import DailyStudyModelSerializer, GroupCourseModelSerializer, DailyStudyValidateSerializer
+from .serializer import DailyStudyModelSerializer, DailyStudyValidateSerializer
 from .permissions import IsTeacherExecutiveAdmin, CanEditDailyStudy, is_authority
 
 
@@ -43,35 +43,6 @@ class DSIntervalListAPIView(generics.ListAPIView):
         end = self.kwargs['end']
 
         return DailyStudy.objects.get_by_interval(user=user, begining=begining, end=end)
-
-
-class GroupCourseListAPIView(generics.ListAPIView):
-    serializer_class = GroupCourseModelSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def get_queryset(self):
-        group = self.request.user.profile.group
-        if group:
-            return group.courses.all()
-        return Course.objects.none()
-
-
-class UserGroupCourseListAPIView(generics.ListAPIView):
-    serializer_class = GroupCourseModelSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def get_queryset(self):
-
-        try:
-            user = User.objects.get(id=self.kwargs['user'])
-        except User.DoesNotExist:
-            # raise NotFound("User not found")
-            raise NotFound("Kullanıcı bulunamadı")
-
-        group = user.profile.group
-        if group:
-            return group.courses.all()
-        return Course.objects.none()
 
 
 class AdminDSRetrieveUpdateAPIView(generics.RetrieveUpdateDestroyAPIView):

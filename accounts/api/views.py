@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from accounts.models import User, Profile, ClassRoom, Groups, Area, Region
 from .permissions import IsTeacherExecutiveAdmin, IsExecutiveAdmin, IsAdmin, CanEditClassroom, CanEditProfile
 from .serializer import (
-    ProfileModelSerializer, ClassRoomModelSerializer, GroupSerializer,
+    ProfileModelSerializer, ClassRoomModelSerializer,
     AdminProfileSerializer, AdminMakeStudentSeriazlier,
     AdminChangeClassRoomSerializer, AdminChangeAreaSerializer,
     AdminClassroomTeacherSerializer, AdminClassroomSerializer, AdminAreaSeriazlier,
@@ -55,11 +55,6 @@ class ClassRoomRetrieveAPIView(generics.RetrieveAPIView):
 
 
 # **************************************************
-
-class AdminGroupList(generics.ListAPIView):
-    serializer_class = GroupSerializer
-    # permission_classes = (IsAuthenticated, IsTeExAd)
-    queryset = Groups.objects.all()
 
 
 class AdminProfileViewSet(viewsets.ModelViewSet):
