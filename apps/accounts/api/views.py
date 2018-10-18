@@ -7,7 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.accounts.models import User, Profile, ClassRoom, Area, Region
-from apps.accounts.api.permissions import IsTeacherExecutiveAdmin, IsExecutiveAdmin, IsAdmin, CanEditClassroom, CanEditProfile
+from apps.accounts.api.permissions import IsTeacherExecutiveAdmin, IsExecutiveAdmin, IsAdmin, CanEditClassroom, \
+    CanEditProfile
 from apps.accounts.api.serializer import (
     ProfileModelSerializer, ClassRoomModelSerializer,
     AdminProfileSerializer, AdminMakeStudentSeriazlier,
@@ -34,11 +35,20 @@ class ListAllProfileAPIView(generics.ListAPIView):
 
 
 class ProfileViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    serializer_class = StudentProfileSerializer
+    serializer_class = ProfileModelSerializer
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return Profile.objects.filter(id=self.request.user.profile.id)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = StudentProfileSerializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        body = self.get_serializer(self.get_object()).data
+        return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
     @action(detail=False, permission_classes=[IsAuthenticated])
     def me(self, request):
@@ -75,7 +85,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        body = self.get_serializer(instance).data
+        body = self.get_serializer(self.get_object()).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
     @action(detail=True, methods=['put'], permission_classes=[IsTeacherExecutiveAdmin])
@@ -100,7 +110,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         profile.is_executive = False
         profile.save()
 
-        body = self.get_serializer(profile).data
+        body = self.get_serializer(self.get_object()).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
     @action(detail=True, methods=['put'], permission_classes=[IsExecutiveAdmin])
@@ -112,7 +122,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         profile.is_teacher = True
         profile.save()
 
-        body = self.get_serializer(profile).data
+        body = self.get_serializer(self.get_object()).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
     @action(detail=True, methods=['put'], permission_classes=[IsAdmin])
@@ -124,7 +134,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         profile.is_executive = True
         profile.save()
 
-        body = self.get_serializer(profile).data
+        body = self.get_serializer(self.get_object()).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
     @action(detail=True, methods=['put'], permission_classes=[IsTeacherExecutiveAdmin])
@@ -145,7 +155,7 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
 
         profile.save()
 
-        body = self.get_serializer(profile).data
+        body = self.get_serializer(self.get_object()).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
 
@@ -186,7 +196,7 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
         classroom.teachers.add(user)
         classroom.save()
 
-        body = self.get_serializer(classroom).data
+        body = self.get_serializer(self.get_object()).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
     @action(detail=True, methods=['put'], permission_classes=[CanEditClassroom])
@@ -199,7 +209,7 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
             classroom.teachers.remove(user)
             classroom.save()
 
-        body = self.get_serializer(classroom).data
+        body = self.get_serializer(self.get_object()).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
 
@@ -263,7 +273,7 @@ class AdminAreaViewset(viewsets.ModelViewSet):
         area.executives.add(user)
         area.save()
 
-        body = self.get_serializer(area).data
+        body = self.get_serializer(self.get_object()).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
     @action(detail=True, methods=['put'])
@@ -276,5 +286,5 @@ class AdminAreaViewset(viewsets.ModelViewSet):
             area.executives.remove(user)
             area.save()
 
-        body = self.get_serializer(area).data
+        body = self.get_serializer(self.get_object()).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
