@@ -62,7 +62,6 @@ class MyClassRoomSerializer(serializers.ModelSerializer):
 # ***********************************************
 class ProfileModelSerializer(serializers.ModelSerializer):
     user = UserModelSerializer()
-    group = GroupSerializer()
 
     class Meta:
         model = Profile
@@ -114,7 +113,6 @@ class ProfileModelSerializer(serializers.ModelSerializer):
 
 class StudentProfileSerializer(ProfileModelSerializer):
     classroom = serializers.PrimaryKeyRelatedField(required=True, queryset=ClassRoom.objects.all())
-    group = GroupSerializer(read_only=True)
     joined_date = serializers.DateField(read_only=True)
 
 
