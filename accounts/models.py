@@ -3,7 +3,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.timezone import now
 
-from base.models import Course
+from base.models import Groups
 
 
 class Region(models.Model):
@@ -33,16 +33,6 @@ class ClassRoom(models.Model):
 
     teachers = models.ManyToManyField(User, related_name='classroom_teachers', blank=True)
     area = models.ForeignKey(Area, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-
-
-class Groups(models.Model):
-    name = models.TextField()
-    description = models.TextField(blank=True)
-
-    courses = models.ManyToManyField(Course, related_name="group_course")
 
     def __str__(self):
         return self.name

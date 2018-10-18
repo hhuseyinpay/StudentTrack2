@@ -6,12 +6,6 @@ from rest_framework import serializers
 from daily_study.models import DailyStudy, Study, Course
 
 
-class GroupCourseModelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Course
-        fields = ('id', 'name', 'description',)
-
-
 class StudyModelSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
 
