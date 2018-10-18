@@ -45,12 +45,12 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'cachalot',
 
-    'base',
     'student',
-    'accounts',
-    'syllabus',
-    'daily_study',
-    'reports'
+    'apps.base',
+    'apps.accounts',
+    'apps.syllabus',
+    'apps.daily_study',
+    'apps.reports'
 ]
 
 MIDDLEWARE = [
