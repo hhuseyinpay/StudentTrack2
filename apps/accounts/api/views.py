@@ -110,6 +110,10 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
         profile.is_executive = False
         profile.save()
 
+        # teacher veya executive'se sil.
+        ClassRoom.objects.filter(teachers=profile.user).delete()
+        Area.objects.filter(executives=profile.user).delete()
+
         body = self.get_serializer(self.get_object()).data
         return Response(data=body, status=status.HTTP_202_ACCEPTED)
 
