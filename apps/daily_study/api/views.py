@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, NotFound
 
-from apps.daily_study.models import DailyStudy
+from daily_study.models import DailyStudy
 from .serializer import DailyStudyModelSerializer, DailyStudyValidateSerializer
 from .permissions import IsTeacherExecutiveAdmin, CanEditDailyStudy, is_authority
 

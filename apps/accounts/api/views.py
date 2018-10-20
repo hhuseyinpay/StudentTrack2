@@ -6,10 +6,10 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.accounts.models import User, Profile, ClassRoom, Area, Region
-from apps.accounts.api.permissions import IsTeacherExecutiveAdmin, IsExecutiveAdmin, IsAdmin, CanEditClassroom, \
+from accounts.models import User, Profile, ClassRoom, Area, Region
+from accounts.api.permissions import IsTeacherExecutiveAdmin, IsExecutiveAdmin, IsAdmin, CanEditClassroom, \
     CanEditProfile
-from apps.accounts.api.serializer import (
+from accounts.api.serializer import (
     ProfileModelSerializer, ClassRoomModelSerializer,
     AdminProfileSerializer, AdminMakeStudentSeriazlier,
     AdminChangeClassRoomSerializer, AdminClassroomTeacherSerializer, AdminClassroomSerializer, AdminAreaSeriazlier,

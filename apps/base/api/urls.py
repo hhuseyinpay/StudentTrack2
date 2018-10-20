@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from apps.base.api.views import UserGroupCourseListAPIView, GroupListAPIView, GroupViewset
+from base.api.views import UserGroupCourseListAPIView, GroupListAPIView, GroupViewset
 
 group_router = DefaultRouter()
 group_router.register('groups', GroupViewset, 'groupviewset')

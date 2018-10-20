@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.TextField()),
                 ('description', models.TextField(blank=True)),
-                ('courses', models.ManyToManyField(related_name='group_course', to='apps.base.Course')),
+                ('courses', models.ManyToManyField(related_name='group_course', to='base.Course')),
             ],
         ),
     ]

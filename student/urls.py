@@ -46,12 +46,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # path('api/login/', views.ObtainAuthToken.as_view(), name="api-login"),
-    path('api/courses/', include('apps.base.api.urls')),
-    path('api/daily_study/', include('apps.daily_study.api.urls')),
-    path('api/syllabus/', include('apps.syllabus.api.urls')),
-    path('api/accounts/', include('apps.accounts.api.urls')),
-    path('reports/', include('apps.reports.urls')),
-    path('api/reports/', include('apps.reports.api.urls'))
+    path('api/courses/', include('base.api.urls')),
+    path('api/daily_study/', include('daily_study.api.urls')),
+    path('api/syllabus/', include('syllabus.api.urls')),
+    path('api/accounts/', include('accounts.api.urls')),
+    path('reports/', include('reports.urls')),
+    path('api/reports/', include('reports.api.urls'))
 ]
 
 if settings.DEBUG:

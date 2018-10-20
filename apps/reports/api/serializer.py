@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from apps.accounts.models import Region
-from apps.base.models import Groups
+from accounts.models import Region
+from base.models import Groups
 
 
 class WeeksSerialzier(serializers.Serializer):

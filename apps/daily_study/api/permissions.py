@@ -1,4 +1,4 @@
-from apps.accounts.api.permissions import IsTeacherExecutiveAdmin, is_authority
+from accounts.api.permissions import IsTeacherExecutiveAdmin, is_authority
 
 
 class CanEditDailyStudy(IsTeacherExecutiveAdmin):

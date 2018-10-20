@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from apps.accounts.api.views import ProfileViewSet, ListAllProfileAPIView, UserLoginAPIView, \
+from accounts.api.views import ProfileViewSet, ListAllProfileAPIView, UserLoginAPIView, \
     AdminProfileViewSet, AdminClassroomViewSet, AdminAreaViewset, ClassRoomRetrieveAPIView
 
 user_router = DefaultRouter()

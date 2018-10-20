@@ -5,10 +5,10 @@ from rest_framework.generics import views
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from apps.accounts.api.permissions import IsTeacherExecutiveAdmin
+from accounts.api.permissions import IsTeacherExecutiveAdmin
 from .serializer import DailyStudyReportGeneratorSerialzier
-from apps.daily_study.models import DailyStudy, Study
-from apps.accounts.models import Profile, Groups
+from daily_study.models import DailyStudy, Study
+from accounts.models import Profile, Groups
 from .excel_generator import ExcelGenerator
 
 

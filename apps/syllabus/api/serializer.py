@@ -2,7 +2,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from rest_framework import serializers
 
 from ..models import Content, Syllabus, UserSyllabus
-from apps.base.models import Course
+from base.models import Course
 
 
 class CourseSerializer(serializers.ModelSerializer):

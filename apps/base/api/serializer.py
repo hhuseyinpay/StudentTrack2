@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.base.models import Course, Groups
+from base.models import Course, Groups
 
 
 class GroupCourseModelSerializer(serializers.ModelSerializer):

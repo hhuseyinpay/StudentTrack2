@@ -1,6 +1,9 @@
 import os
+import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+
 SECRET_KEY = '3t#28v06tdlwe7x4!f9&@ear%c^f%$aqds8^ncbq_w#$oqrl8h'
 ALLOWED_HOSTS = ["*"]
 WSGI_APPLICATION = 'student.wsgi.application'
@@ -47,11 +50,11 @@ INSTALLED_APPS = [
     'drf_yasg',
 
     'student',
-    'apps.base',
-    'apps.accounts',
-    'apps.syllabus',
-    'apps.daily_study',
-    'apps.reports'
+    'base',
+    'accounts',
+    'syllabus',
+    'daily_study',
+    'reports'
 ]
 
 MIDDLEWARE = [

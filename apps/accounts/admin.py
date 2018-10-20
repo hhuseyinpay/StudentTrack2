@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.accounts.models import Profile, ClassRoom, Area, Region, Groups
+from accounts.models import Profile, ClassRoom, Area, Region, Groups
 
 
 # Register your models here.

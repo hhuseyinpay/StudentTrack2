@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.TextField()),
                 ('description', models.TextField(blank=True)),
-                ('area', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='apps.accounts.Area')),
+                ('area', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='accounts.Area')),
                 ('teachers', models.ManyToManyField(blank=True, related_name='classroom_teachers', to=settings.AUTH_USER_MODEL)),
             ],
         ),
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.TextField()),
                 ('description', models.TextField(blank=True)),
-                ('courses', models.ManyToManyField(related_name='group_course', to='apps.base.Course')),
+                ('courses', models.ManyToManyField(related_name='group_course', to='base.Course')),
             ],
         ),
         migrations.CreateModel(
@@ -55,9 +55,9 @@ class Migration(migrations.Migration):
                 ('is_teacher', models.BooleanField(default=False)),
                 ('is_executive', models.BooleanField(default=False)),
                 ('is_admin', models.BooleanField(default=False)),
-                ('classroom', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='apps.accounts.ClassRoom')),
+                ('classroom', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='accounts.ClassRoom')),
                 ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='profile_created_by', to=settings.AUTH_USER_MODEL)),
-                ('group', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='apps.accounts.Groups')),
+                ('group', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='accounts.Groups')),
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
@@ -73,6 +73,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='area',
             name='region',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='apps.accounts.Region'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='accounts.Region'),
         ),
     ]

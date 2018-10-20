@@ -36,8 +36,8 @@ class Migration(migrations.Migration):
                 ('begining', models.FloatField()),
                 ('end', models.FloatField()),
                 ('amount', models.FloatField()),
-                ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='apps.base.Course')),
-                ('studies', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='studies', to='apps.daily_study.DailyStudy')),
+                ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Course')),
+                ('studies', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='studies', to='daily_study.DailyStudy')),
             ],
         ),
     ]

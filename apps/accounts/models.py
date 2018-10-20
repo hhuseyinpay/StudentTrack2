@@ -3,7 +3,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.timezone import now
 
-from apps.base.models import Groups
+from base.models import Groups
 
 
 class Region(models.Model):

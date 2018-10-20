@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('level', models.SmallIntegerField()),
-                ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='apps.base.Course')),
+                ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Course')),
             ],
             options={
                 'ordering': ('course', 'level'),
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('is_validated', models.BooleanField(default=False)),
-                ('content', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='apps.syllabus.Content')),
+                ('content', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='syllabus.Content')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('validator_user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='syllabus_validator_user', to=settings.AUTH_USER_MODEL)),
             ],
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='content',
             name='syllabus',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='contents', to='apps.syllabus.Syllabus'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='contents', to='syllabus.Syllabus'),
         ),
         migrations.AlterUniqueTogether(
             name='usersyllabus',

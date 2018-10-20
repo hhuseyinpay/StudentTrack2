@@ -3,7 +3,7 @@ from datetime import datetime
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from apps.daily_study.models import DailyStudy, Study
+from daily_study.models import DailyStudy, Study
 
 
 class StudyModelSerializer(serializers.ModelSerializer):

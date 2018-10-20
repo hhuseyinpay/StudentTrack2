@@ -3,8 +3,8 @@ from rest_framework import generics, viewsets
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import AllowAny
 
-from apps.accounts.api.permissions import IsAdmin
-from apps.base.models import Course, Groups
+from accounts.api.permissions import IsAdmin
+from base.models import Course, Groups
 from .serializer import GroupCourseModelSerializer, GroupSerializer
 
 

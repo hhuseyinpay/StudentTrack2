@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from apps.accounts.models import ClassRoom, Area, Region
+from accounts.models import ClassRoom, Area, Region
 
 
 class IsTeacher(permissions.BasePermission):

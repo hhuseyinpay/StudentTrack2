@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from apps.accounts.models import User, Profile, Groups, Region, Area, ClassRoom
+from accounts.models import User, Profile, Groups, Region, Area, ClassRoom
 
 
 class UserModelSerializer(serializers.ModelSerializer):
@@ -73,8 +73,7 @@ class ProfileModelSerializer(serializers.ModelSerializer):
         user = User(**u)  # new user create
         user.set_password(password)
         user.save()
-        for i, v in validated_data.items():
-            print("    ", i, ": ", v)
+
         return Profile.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):

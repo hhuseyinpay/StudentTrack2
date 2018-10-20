@@ -3,7 +3,7 @@ from datetime import datetime, date
 from django.db import models
 from django.conf import settings
 from django.utils.timezone import now
-from apps.base.models import Course
+from base.models import Course
 
 
 # Create your models here.
