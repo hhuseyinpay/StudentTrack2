@@ -10,12 +10,11 @@ class UserModelSerializer(serializers.ModelSerializer):
     ])
     first_name = serializers.CharField(min_length=2, max_length=50)
     last_name = serializers.CharField(min_length=2, max_length=30)
-    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
         fields = ('id', 'username', 'password', 'first_name', 'last_name')
-
+        extra_kwargs = {'password': {'write_only': True}}
 
 # *********************************************
 
