@@ -82,7 +82,7 @@ class AdminUSAPIView(generics.ListAPIView):
                                            content__syllabus__level=lvl)
 
     def get_serializer_context(self):
-        return {'user': self.kwargs['user']}
+        return {'user': self.kwargs.get('user')}
 
 
 class AdminUSValidateAPIView(generics.UpdateAPIView):
