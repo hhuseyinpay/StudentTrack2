@@ -10,7 +10,7 @@ class Region(models.Model):
     name = models.TextField(unique=True)
     description = models.TextField(blank=True)
 
-    admins = models.ManyToManyField(User, related_name='region_admins', blank=True)
+    admins = models.ManyToManyField(User, related_name='region_admin', blank=True)
 
     def __str__(self):
         return self.name
@@ -20,7 +20,7 @@ class Area(models.Model):
     name = models.TextField(unique=True)
     description = models.TextField(blank=True)
 
-    executives = models.ManyToManyField(User, related_name='area_executives', blank=True)
+    executives = models.ManyToManyField(User, related_name='area_executive', blank=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -31,7 +31,7 @@ class ClassRoom(models.Model):
     name = models.TextField()
     description = models.TextField(blank=True)
 
-    teachers = models.ManyToManyField(User, related_name='classroom_teachers', blank=True)
+    teachers = models.ManyToManyField(User, related_name='classroom_teacher', blank=True)
     area = models.ForeignKey(Area, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -44,7 +44,7 @@ class ProfileManager(models.Manager):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True, db_index=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_regex = RegexValidator(regex=r'^(05)[0-9][0-9]([0-9]){7}$',
                                  message="Format hatası. Telefon numarası şu formatta olmalı:'05515524294'")
     phone_number = models.CharField(validators=[phone_regex], max_length=11, blank=True)  # validators should be a list
@@ -58,7 +58,7 @@ class Profile(models.Model):
     is_executive = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
 
-    created_by = models.ForeignKey(User, related_name='profile_created_by', on_delete=models.DO_NOTHING)
+    created_by = models.ForeignKey(User, related_name='profile_creator', on_delete=models.DO_NOTHING)
     objects = ProfileManager()
 
     def __str__(self):

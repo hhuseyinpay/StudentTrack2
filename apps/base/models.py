@@ -18,7 +18,7 @@ class Groups(models.Model):
     name = models.TextField()
     description = models.TextField(blank=True)
 
-    courses = models.ManyToManyField(Course, related_name="group_course")
+    courses = models.ManyToManyField(Course, related_name="groups")
 
     def __str__(self):
         return self.name

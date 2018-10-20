@@ -50,7 +50,7 @@ class DailyStudy(models.Model):
 
 class Study(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    studies = models.ForeignKey(DailyStudy, related_name='studies', on_delete=models.CASCADE)
+    daily_study = models.ForeignKey(DailyStudy, related_name='studies', on_delete=models.CASCADE)
 
     begining = models.FloatField()
     end = models.FloatField()
