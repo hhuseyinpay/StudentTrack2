@@ -12,7 +12,7 @@ class UserListSerializer(serializers.ModelSerializer):
 
 
 class UserModelSerializer(serializers.ModelSerializer):
-    user_type = serializers.CharField(source='get_user_type_display', read_only=True)
+    # user_type = serializers.CharField(source='get_user_type_display', read_only=True)
 
     class Meta:
         model = User
