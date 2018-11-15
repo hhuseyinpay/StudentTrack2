@@ -1,10 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.db import models
-from django.conf import settings
 
-from base.models import Course
-
+from course.models import Course
 
 # Create your models here.
+User = get_user_model()
+
 
 class SyllabusManager(models.Manager):
     def level(self, level):
@@ -18,11 +19,11 @@ class Syllabus(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     level = models.SmallIntegerField()
 
+    objects = SyllabusManager()
+
     class Meta:
         unique_together = (('course', 'level'),)
-        ordering = ('course', 'level')  # django admin için
-
-    objects = SyllabusManager()
+        ordering = ('level', 'course')  # django admin için
 
     def __str__(self):
         return str(self.course.name) + " | " + str(self.level)
@@ -39,8 +40,6 @@ class Content(models.Model):
         unique_together = (('week', 'syllabus'),)
         ordering = ('syllabus', 'week', 'name')  # django admin için
 
-    # amount = models.FloatField()
-
     def __str__(self):
         """
         Admin'den yeni content eklerken kolaylık sağlamak amacıyla syllabus ismini vs alıyordum
@@ -56,14 +55,14 @@ class UserSyllabusManager(models.Manager):
 
 
 class UserSyllabus(models.Model):
-    class Meta:
-        unique_together = (('content', 'user'),)
-
-    content = models.ForeignKey(Content, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    content = models.ForeignKey(Content, on_delete=models.CASCADE, db_index=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     is_validated = models.BooleanField(default=False)
-    validator_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='syllabus_validator_user',
-                                       on_delete=models.CASCADE, blank=True, null=True)
+    validator_user = models.ForeignKey(User, related_name='syllabus_validator_user',
+                                       on_delete=models.CASCADE, blank=True, null=True, db_index=False)
 
     objects = UserSyllabusManager()
+
+    class Meta:
+        unique_together = (('content', 'user'),)

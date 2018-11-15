@@ -19,10 +19,16 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
 from rest_framework import permissions
-from rest_framework.authtoken import views
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from rest_framework.routers import DefaultRouter
+
+from account.api.views import UserViewSet, UserLoginAPIView, AdminUserViewSet
+from course.api.views import CourseGroupViewset, CourseViewSet
+from daily_study.api.views import DailyStudyViewset, AdminDailyStudyViewset
+from location.api.views import ClassRoomRetrieveViewSet, AreaRetrieveViewSet, AdminClassroomViewSet, AdminAreaViewset
+from syllabus.api.views import SyllabusViewSet, UserSyllabusViewSet, AdminUserSyllabusViewSet, ContentViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -37,6 +43,47 @@ schema_view = get_schema_view(
     public=True,
     permission_classes=(permissions.IsAuthenticated,),
 )
+admin_router = DefaultRouter()
+user_router = DefaultRouter()
+
+###
+# account app
+###
+user_router.register('user', UserViewSet, 'user-viewset')
+
+admin_router.register('user', AdminUserViewSet, 'adminuser-viewset')
+
+###
+# location app
+###
+user_router.register('classroom', ClassRoomRetrieveViewSet, 'classroomretrieve-viewset')
+user_router.register('area', AreaRetrieveViewSet, 'arearetrieve-viewset')
+user_router.register('region', ClassRoomRetrieveViewSet, 'regionretrieve-viewset')
+
+admin_router.register('classroom', AdminClassroomViewSet, 'adminclassroom-viewset')
+admin_router.register('area', AdminAreaViewset, 'adminarea-viewset')
+
+###
+# course app
+###
+user_router.register('course-gorup', CourseGroupViewset, 'coursegroup-viewset')
+user_router.register('course', CourseViewSet, 'course-viewset')
+
+###
+# syllabus app
+###
+user_router.register('content', ContentViewSet, 'content-viewset')
+user_router.register('syllabus', SyllabusViewSet, 'syllabus-viewset')
+user_router.register('user-syllabus', UserSyllabusViewSet, 'usersyllabus-viewset')
+
+admin_router.register('user-syllabus', AdminUserSyllabusViewSet, 'adminusersyllabus-viewset')
+
+###
+# daily_study app
+###
+user_router.register('daily-study', DailyStudyViewset, 'dailystudy-viewset')
+
+admin_router.register('daily-study', AdminDailyStudyViewset, 'admindailystudy-viewset')
 
 urlpatterns = [
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
@@ -45,13 +92,12 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
 
-    # path('api/login/', views.ObtainAuthToken.as_view(), name="api-login"),
-    path('api/courses/', include('base.api.urls')),
-    path('api/daily_study/', include('daily_study.api.urls')),
-    path('api/syllabus/', include('syllabus.api.urls')),
-    path('api/accounts/', include('accounts.api.urls')),
-    path('reports/', include('reports.urls')),
-    path('api/reports/', include('reports.api.urls'))
+    path('api/', include(user_router.urls)),
+    path('api/admin/', include(admin_router.urls)),
+    path('api/login', UserLoginAPIView.as_view(), name='api-login')
+
+    # path('reports/', include('reports.urls')),
+    # path('api/reports/', include('reports.api.urls'))
 ]
 
 if settings.DEBUG:

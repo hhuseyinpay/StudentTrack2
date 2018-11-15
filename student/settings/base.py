@@ -4,6 +4,8 @@ import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
+AUTH_USER_MODEL = 'account.User'
+
 SECRET_KEY = '3t#28v06tdlwe7x4!f9&@ear%c^f%$aqds8^ncbq_w#$oqrl8h'
 ALLOWED_HOSTS = ["*"]
 WSGI_APPLICATION = 'student.wsgi.application'
@@ -50,10 +52,12 @@ INSTALLED_APPS = [
     'drf_yasg',
 
     'student',
-    'base',
-    'accounts',
+    'account',
+    'location',
+    'course',
     'syllabus',
     'daily_study',
+
     'reports'
 ]
 
@@ -132,13 +136,15 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.OrderingFilter',
-        'rest_framework.filters.SearchFilter'
+        'rest_framework.filters.OrderingFilter'
     ),
+    #'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    #'PAGE_SIZE': 2,
+
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
-LOGGING = {
+LLOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
@@ -179,4 +185,15 @@ LOGGING = {
             'propagate': False,
         },
     },
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
+    'USE_SESSION_AUTH': False,
 }

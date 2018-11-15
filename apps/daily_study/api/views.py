@@ -1,122 +1,69 @@
-from django.contrib.auth.models import User
-
-from rest_framework import generics
+from django.utils.timezone import now
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.exceptions import ParseError
+from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import PermissionDenied, NotFound
+from rest_framework.response import Response
 
 from daily_study.models import DailyStudy
-from .serializer import DailyStudyModelSerializer, DailyStudyValidateSerializer
-from .permissions import IsTeacherExecutiveAdmin, CanEditDailyStudy, is_authority
+from daily_study.filters import DailyStudyCreatedDayFilter
+from .permissions import IsDailyStudyOwner, CanEditDailyStudy
+from .serializer import DailyStudyModelSerializer, DailyStudyListSerializer, AdminDailyStudyModelSerializer
 
 
-class DSListCreateAPIView(generics.ListCreateAPIView):
+class DailyStudyViewset(viewsets.ModelViewSet):
     serializer_class = DailyStudyModelSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsDailyStudyOwner)
+    filter_backends = (OrderingFilter, DjangoFilterBackend)
+    filter_class = DailyStudyCreatedDayFilter
 
     def get_queryset(self):
-        return DailyStudy.objects.get_day(self.request.user)
+        return DailyStudy.objects.filter(user=self.request.user)
 
-    def get_serializer_context(self):
-        return {'user': self.request.user}
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return DailyStudyListSerializer
+        else:
+            return DailyStudyModelSerializer
 
+    def perform_create(self, serializer):
+        if DailyStudy.objects.filter(user=self.request.user, created_day=now().date()).exists():
+            raise ParseError("Bir günde birden fazla çetele oluşturulamaz.")
 
-class DSRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
-    serializer_class = DailyStudyModelSerializer
-    permission_classes = (IsAuthenticated,)
-    lookup_field = 'id'
+        serializer.save(user=self.request.user)
 
-    def get_serializer_context(self):
-        return {'user': self.request.user}
-
-    def get_queryset(self):
-        # sadece userın editleyebileceklerini döndürüyor.
-        return DailyStudy.objects.user_editables(self.request.user)
-
-
-class DSIntervalListAPIView(generics.ListAPIView):
-    serializer_class = DailyStudyModelSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def get_queryset(self):
-        user = self.request.user
-        begining = self.kwargs['begining']
-        end = self.kwargs['end']
-
-        return DailyStudy.objects.get_by_interval(user=user, begining=begining, end=end)
+    @action(detail=False, permission_classes=[IsAuthenticated])
+    def today(self, request):
+        ds = self.get_queryset().filter(created_day=now().date())
+        if not ds:
+            body = {"detail": "Bugün çetele oluşturulmadı."}
+            return Response(data=body, status=status.HTTP_404_NOT_FOUND)
+        body = self.get_serializer(ds, many=True).data
+        return Response(body, status=status.HTTP_200_OK)
 
 
-class AdminDSRetrieveUpdateAPIView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = DailyStudyModelSerializer
-    permission_classes = (IsAuthenticated, CanEditDailyStudy,)
-    queryset = DailyStudy.objects.all()
-    lookup_field = 'id'
-
-    def get_serializer_context(self):
-        return {'user': self.request.user}
-
-
-class AdminDSValidateAPIView(generics.RetrieveUpdateAPIView):
-    serializer_class = DailyStudyValidateSerializer
-    permission_classes = (IsAuthenticated, CanEditDailyStudy,)
-    queryset = DailyStudy.objects.all()
-    lookup_field = 'id'
-
-    def get_serializer_context(self):
-        return {'user': self.request.user}
-
-
-class AdminDSNotvalidatedAPIView(generics.ListAPIView):
-    serializer_class = DailyStudyModelSerializer
-    permission_classes = (IsAuthenticated, IsTeacherExecutiveAdmin,)
-
-    def get_queryset(self):
-        try:
-            user = User.objects.get(id=self.kwargs['user'])
-        except User.DoesNotExist:
-            # raise NotFound("User not found")
-            raise NotFound("Kullanıcı bulunamadı")
-        if not is_authority(self.request.user, user.profile):
-            raise PermissionDenied()
-        return DailyStudy.objects.filter(user=user, is_validated=False).order_by("-created_day")
-
-
-class AdminDSClassroomListAPIView(generics.ListAPIView):
-    serializer_class = DailyStudyModelSerializer
-    permission_classes = (IsAuthenticated, IsTeacherExecutiveAdmin,)
-
-    def get_queryset(self):
-        user = self.request.user
-        classroom = self.kwargs['classroom']
-        day = self.kwargs['day']
-        users = User.objects.filter(profile__classroom=classroom)
-        return DailyStudy.objects.filter(user__in=users, created_day=day)
-
-
-class AdminDsRetrieveUserDayAPIView(generics.RetrieveAPIView):
+class AdminDailyStudyViewset(viewsets.ModelViewSet):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated, CanEditDailyStudy)
-    lookup_field = "user"
+    filter_backends = (OrderingFilter, DjangoFilterBackend)
+    filter_class = DailyStudyCreatedDayFilter
+    queryset = DailyStudy.objects.all()
 
-    def get_queryset(self):
-        user = self.kwargs['user']
-        day = self.kwargs['day']
-        return DailyStudy.objects.filter(user=user, created_day=day)
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return DailyStudyListSerializer
+        else:
+            return AdminDailyStudyModelSerializer
 
+    @action(detail=True, permission_classes=[IsAuthenticated, CanEditDailyStudy])
+    def validate(self, request, pk=None):
+        ds = self.get_object()
+        ds.is_validated = True
+        ds.validator_user = request.user
+        ds.validate_time = now()
+        ds.save()
 
-class AdminDSIntervalListAPIView(generics.ListAPIView):
-    serializer_class = DailyStudyModelSerializer
-    permission_classes = (IsAuthenticated, IsTeacherExecutiveAdmin)
-
-    def get_queryset(self):
-        try:
-            user = User.objects.get(id=self.kwargs['user'])
-        except User.DoesNotExist:
-            # raise NotFound("User not found")
-            raise NotFound("Kullanıcı bulunamadı")
-        if not is_authority(self.request.user, user.profile):
-            raise PermissionDenied()
-
-        begining = self.kwargs['begining']
-        end = self.kwargs['end']
-
-        return DailyStudy.objects.get_by_interval(user=user, begining=begining, end=end)
+        body = self.get_serializer(ds, many=True).data
+        return Response(body, status=status.HTTP_200_OK)

@@ -1,107 +1,82 @@
-from rest_framework import generics, viewsets
+from rest_framework import viewsets, mixins, status
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
 
-from ..models import Syllabus, UserSyllabus
-from .serializer import SyllabusModelSerializer, UserSyllabusModelSerializer, SyllabusListSerializer, \
-    UserSyllabusValidateSerializer, UserSyllabusNotValidatedSerializer, AdminUserSyllabusModelSerializer
-from .permissions import CanEditSyllabus
+from account.api.permissions import IsStaff
+from syllabus.models import Syllabus, Content, UserSyllabus
+from .serializer import SyllabusModelSerializer, UserSyllabusModelSerializer, \
+    AdminUserSyllabusModelSerializer, LevelListSerializer, CourseListSeriazlier, ContentModelSerializer
+from .permissions import CanEditSyllabus, IsSyllabusOwner
 
 
-class SyllabusAllListAPIView(generics.ListAPIView):
+class ContentViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = ContentModelSerializer
+    queryset = Content.objects.all()
+
+
+class SyllabusViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     serializer_class = SyllabusModelSerializer
-    permission_classes = (AllowAny,)
+    filter_fields = ('level', 'course')
+    queryset = Syllabus.objects.all()
 
-    def get_queryset(self):
-        return Syllabus.objects.all()
+    @action(detail=False)
+    def levels(self, request):
+        qs = Syllabus.objects.distinct('level')
+
+        body = LevelListSerializer(qs, many=True).data
+        return Response(data=body, status=status.HTTP_200_OK)
+
+    @action(detail=False, url_path='level/(?P<level>[0-9]+)/courses', permission_classes=[AllowAny])
+    def levelcourses(self, request, level=None):
+        qs = Syllabus.objects.filter(level=level)
+
+        body = CourseListSeriazlier(qs, many=True).data
+        return Response(data=body, status=status.HTTP_200_OK)
+
+    @action(detail=True)
+    def contents(self, request, pk=None):
+        qs = Content.objects.filter(syllabus=pk)
+
+        body = ContentModelSerializer(qs, many=True)
+        return Response(data=body, status=status.HTTP_200_OK)
 
 
-class SyllabusLevelListAPIView(generics.ListAPIView):
-    serializer_class = SyllabusListSerializer
-    permission_classes = (AllowAny,)
-
-    def get_queryset(self):
-        lvl = self.kwargs['level']
-        return Syllabus.objects.level(lvl)
-
-
-class SyllabusLevelCourseAPIView(generics.ListAPIView):
-    serializer_class = SyllabusModelSerializer
-    permission_classes = (AllowAny,)
-
-    def get_queryset(self):
-        lvl = self.kwargs['level']
-        cr = self.kwargs['course']
-        return Syllabus.objects.level_course(lvl, cr)
-
-
-class UserSyllabusUserViewSet(viewsets.ModelViewSet):
+class UserSyllabusViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, mixins.ListModelMixin,
+                          mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     serializer_class = UserSyllabusModelSerializer
-    permission_classes = (IsAuthenticated,)
-    http_method_names = ['post', 'delete']
+    filter_fields = ('content__syllabus__level', 'content__syllabus__course', 'is_validated')
+    permission_classes = (IsAuthenticated, IsSyllabusOwner)
+
+    # queryset = UserSyllabus.objects.all()
 
     def get_queryset(self):
-        return UserSyllabus.objects.user(self.request.user)
+        return UserSyllabus.objects.all(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
 
-class UserSyllabusAPIView(generics.ListAPIView):
-    serializer_class = UserSyllabusModelSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def get_queryset(self):
-        lvl = self.kwargs['level']
-        cr = self.kwargs['course']
-
-        return UserSyllabus.objects.filter(user=self.request.user, content__syllabus__course=cr,
-                                           content__syllabus__level=lvl)
-
-    def get_serializer_context(self):
-        return {'user': self.request.user}
-
-
-class UserSyllabusNotValidatedAPIView(generics.ListAPIView):
-    serializer_class = UserSyllabusNotValidatedSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def get_queryset(self):
-        return UserSyllabus.objects.filter(user=self.request.user, is_validated=False)
-
-
-class AdminUSAPIView(generics.ListAPIView):
-    serializer_class = UserSyllabusModelSerializer
-    permission_classes = (IsAuthenticated, CanEditSyllabus)
-
-    def get_queryset(self):
-        user = self.kwargs['user']
-        lvl = self.kwargs['level']
-        cr = self.kwargs['course']
-
-        return UserSyllabus.objects.filter(user=user, content__syllabus__course=cr,
-                                           content__syllabus__level=lvl)
-
-    def get_serializer_context(self):
-        return {'user': self.kwargs.get('user')}
-
-
-class AdminUSValidateAPIView(generics.UpdateAPIView):
-    serializer_class = UserSyllabusValidateSerializer
+class AdminUserSyllabusViewSet(viewsets.ModelViewSet):
+    serializer_class = AdminUserSyllabusModelSerializer
+    filter_fields = ('user', 'content__syllabus__level', 'content__syllabus__course', 'is_validated')
     permission_classes = (IsAuthenticated, CanEditSyllabus)
     queryset = UserSyllabus.objects.all()
-    lookup_field = 'id'
 
-    def get_serializer_context(self):
-        return {'user': self.request.user}
+    @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, CanEditSyllabus])
+    def validate(self, request, pk=None):
+        us = self.get_object()
+        us.is_validate = True
+        us.validator_user = self.request.user
+        us.save()
 
+        body = self.get_serializer(us).data
+        return Response(body, status=status.HTTP_200_OK)
 
-class AdminUSNotValidatedAPIView(generics.ListAPIView):
-    serializer_class = AdminUserSyllabusModelSerializer
-    permission_classes = (IsAuthenticated, CanEditSyllabus)
+    @action(detail=False, url_path='notvalidated/user/(?P<user_id>[0-9]+)',
+            permission_classes=[IsAuthenticated, IsStaff])
+    def notvalidated(self, request, user_id=None):
+        us = UserSyllabus.objects.filter(user=user_id)
 
-    def get_queryset(self):
-        user = self.kwargs['user']
-        return UserSyllabus.objects.filter(user=user, is_validated=False)
-
-    def get_serializer_context(self):
-        return {'user': self.request.user}
+        body = self.get_serializer(us, many=True).data
+        return Response(body, status=status.HTTP_200_OK)

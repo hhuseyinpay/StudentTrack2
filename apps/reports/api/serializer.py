@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from accounts.models import Region
-from base.models import Groups
+from location.models import Region
+from course.models import CourseGroups
 
 
 class WeeksSerialzier(serializers.Serializer):
@@ -16,6 +16,6 @@ class WeeksSerialzier(serializers.Serializer):
 
 class DailyStudyReportGeneratorSerialzier(serializers.Serializer):
     region = serializers.PrimaryKeyRelatedField(required=True, queryset=Region.objects.all())
-    group = serializers.PrimaryKeyRelatedField(required=True, queryset=Groups.objects.all())
+    group = serializers.PrimaryKeyRelatedField(required=True, queryset=CourseGroups.objects.all())
     include_teacher = serializers.BooleanField(required=True)
     weeks = WeeksSerialzier(required=True, many=True)
