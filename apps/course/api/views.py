@@ -17,10 +17,10 @@ class CourseGroupViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, views
             return CourseGroupListSerializer
         return self.serializer_class
 
-    @action(detail=False, url_path='user/(?P<user>[0-9]+)')
-    def user(self, request, user=None):
+    @action(detail=False, url_path='user/(?P<user_id>[0-9]+)')
+    def user(self, request, user_id=None):
         try:
-            user = User.objects.get(id=user)
+            user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             # raise NotFound("User not found")
             raise NotFound("Kullanıcı bulunamadı")
