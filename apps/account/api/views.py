@@ -20,7 +20,7 @@ class UserLoginAPIView(views.ObtainAuthToken):
         serializer = self.serializer_class(data=request.data,
                                            context={'request': request})
         if not serializer.is_valid():
-            return Response({'Kullanıcı adı - Parola': "Kullanıcı adı veya Parola yanlış"},
+            return Response({'detail': "Kullanıcı adı veya Parola yanlış"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         user = serializer.validated_data['user']
