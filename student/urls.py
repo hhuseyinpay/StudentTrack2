@@ -66,7 +66,7 @@ admin_router.register('area', AdminAreaViewset, 'adminarea-viewset')
 ###
 # course app
 ###
-user_router.register('course-gorup', CourseGroupViewset, 'coursegroup-viewset')
+user_router.register('course-group', CourseGroupViewset, 'coursegroup-viewset')
 user_router.register('course', CourseViewSet, 'course-viewset')
 
 ###
