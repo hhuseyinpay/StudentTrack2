@@ -1,0 +1,10 @@
+.*
+!.coveragerc
+!.env
+!.pylintrc
+!.idea/
+!.git/
+!manage\ commands.txt
+!uwsgi.ini
+!uwsgi.pid
+!.gitignore
