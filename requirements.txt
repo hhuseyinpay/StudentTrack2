@@ -35,6 +35,7 @@ redis==2.10.6
 requests==2.20.1
 rfc3987==1.3.8
 ruamel.yaml==0.15.78
+sentry-sdk==0.5.5
 six==1.11.0
 sqlparse==0.2.4
 strict-rfc3339==0.7
