@@ -39,8 +39,8 @@ services:
       - 80:80
     volumes:
       - ./config/conf.d:/etc/nginx/conf.d
-      - static:/opt/services/student/static
-      - media:/opt/services/student/media
+      - static:/opt/services/student/src/static
+      - media:/opt/services/student/src/media
 
     depends_on:
       - web
