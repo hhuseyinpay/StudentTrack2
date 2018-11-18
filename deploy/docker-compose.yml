@@ -25,8 +25,8 @@ services:
       - DJANGO_SETTINGS_MODULE
     volumes:
       - ..:/opt/services/student/src
-      - static:/opt/services/student/static
-      - media:/opt/services/student/media
+      - static:/opt/services/student/src/static
+      - media:/opt/services/student/src/media
 
     depends_on:
       - db
