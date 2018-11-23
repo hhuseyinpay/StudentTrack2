@@ -2,4 +2,4 @@ name = 'tts'
 loglevel = 'info'
 errorlog = '-'
 accesslog = '-'
-workers = 5
+workers = 1
