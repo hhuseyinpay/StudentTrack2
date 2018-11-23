@@ -23,13 +23,9 @@ class UserModelSerializer(serializers.ModelSerializer):
                         'course_group': {'read_only': True}, 'joined_date': {'read_only': True}
                         }
 
-    def create(self, validated_data):
-        password = validated_data.pop('password', None)
-        instance = self.Meta.model(**validated_data)
-        if password is not None:
-            instance.set_password(password)
-        instance.save()
-        return instance
+	def create(self, validated_data):
+		user = User.objects.create_user(**validated_data)
+		return user
 
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
