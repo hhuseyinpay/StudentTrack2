@@ -27,7 +27,8 @@ from rest_framework.routers import DefaultRouter
 from account.api.views import UserViewSet, UserLoginAPIView, AdminUserViewSet
 from course.api.views import CourseGroupViewset, CourseViewSet
 from daily_study.api.views import DailyStudyViewset, AdminDailyStudyViewset
-from location.api.views import ClassRoomRetrieveViewSet, AreaRetrieveViewSet, AdminClassroomViewSet, AdminAreaViewset
+from location.api.views import ClassRoomRetrieveViewSet, AreaRetrieveViewSet, AdminClassroomViewSet, AdminAreaViewset, \
+    RegionRetrieveViewSet
 from syllabus.api.views import SyllabusViewSet, UserSyllabusViewSet, AdminUserSyllabusViewSet, ContentViewSet
 
 schema_view = get_schema_view(
@@ -58,7 +59,7 @@ admin_router.register('user', AdminUserViewSet, 'adminuser-viewset')
 ###
 user_router.register('classroom', ClassRoomRetrieveViewSet, 'classroomretrieve-viewset')
 user_router.register('area', AreaRetrieveViewSet, 'arearetrieve-viewset')
-user_router.register('region', ClassRoomRetrieveViewSet, 'regionretrieve-viewset')
+user_router.register('region', RegionRetrieveViewSet, 'regionretrieve-viewset')
 
 admin_router.register('classroom', AdminClassroomViewSet, 'adminclassroom-viewset')
 admin_router.register('area', AdminAreaViewset, 'adminarea-viewset')
