@@ -22,7 +22,7 @@ from rest_framework import permissions
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import SimpleRouter
 
 from account.api.views import UserViewSet, UserLoginAPIView, AdminUserViewSet
 from course.api.views import CourseGroupViewset, CourseViewSet
@@ -44,8 +44,8 @@ schema_view = get_schema_view(
     public=True,
     permission_classes=(permissions.IsAuthenticated,),
 )
-admin_router = DefaultRouter()
-user_router = DefaultRouter()
+admin_router = SimpleRouter()
+user_router = SimpleRouter()
 
 ###
 # account app
