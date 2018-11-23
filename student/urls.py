@@ -101,5 +101,5 @@ urlpatterns = [
     # path('api/reports/', include('reports.api.urls'))
 ]
 
-if settings.DEBUG:
+if "silk" in settings.INSTALLED_APPS:
     urlpatterns += [url(r'^silk/', include('silk.urls', namespace='silk'))]
