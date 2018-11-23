@@ -2,7 +2,10 @@ from .base import *
 
 DEBUG = False
 
-# INSTALLED_APPS += []
+INSTALLED_APPS += [
+
+    'cachalot',
+]
 
 # MIDDLEWARE += []
 
@@ -16,5 +19,15 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '',
         'CONN_MAX_AGE': 60 * 10,  # 10 minutes
+    }
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
