@@ -50,7 +50,7 @@ class AdminClassroomViewSet(viewsets.ModelViewSet):
         else:
             return ClassRoomModelSerializer
 
-    @action(detail=False, permission_classes=[IsStaff])
+    @action(detail=False, permission_classes=[IsAuthenticated, IsStaff])
     def myclassrooms(self, request):
         staff = request.user
         if staff.is_teacher():
