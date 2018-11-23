@@ -1,0 +1,23 @@
+
+version: '3'
+
+services:
+  # web container, with django + gunicorn
+  web:
+    restart: always
+    build:
+        context: ../
+        dockerfile: deploy/Dockerfile
+    environment:
+      - DJANGO_SETTINGS_MODULE
+    volumes:
+      - ..:/opt/services/student/src
+      - static:/opt/services/student/src/static
+      - media:/opt/services/student/src/media
+
+    command: bash deploy/run_test.sh
+
+
+volumes:
+  static:
+  media:
