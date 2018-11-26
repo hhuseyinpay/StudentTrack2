@@ -13,19 +13,23 @@ class UserListSerializer(serializers.ModelSerializer):
 
 class UserModelSerializer(serializers.ModelSerializer):
     # user_type = serializers.CharField(source='get_user_type_display', read_only=True)
+    username = serializers.CharField(min_length=3, max_length=30, required=True)
+    first_name = serializers.CharField(min_length=3, max_length=30, required=True)
+    last_name = serializers.CharField(min_length=3, max_length=30, required=True)
+    password = serializers.CharField(min_length=3, max_length=30, write_only=True, required=False)
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'phone_number', 'user_type', 'classroom',
-                  'course_group', 'joined_date')
-        extra_kwargs = {'password': {'write_only': True},
-                        'user_type': {'read_only': True}, 'classroom': {'read_only': True},
-                        'course_group': {'read_only': True}, 'joined_date': {'read_only': True}
-                        }
+        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'phone_number',
+                  'user_type', 'classroom', 'course_group', 'joined_date')
+        extra_kwargs = {
+            'user_type': {'read_only': True}, 'classroom': {'read_only': True},
+            'course_group': {'read_only': True}, 'joined_date': {'read_only': True}
+        }
 
-	def create(self, validated_data):
-		user = User.objects.create_user(**validated_data)
-		return user
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
 
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
@@ -38,8 +42,6 @@ class UserModelSerializer(serializers.ModelSerializer):
 
 
 class AdminUserModelSerializer(UserModelSerializer):
-    first_name = serializers.CharField(max_length=30, required=True)
-    last_name = serializers.CharField(max_length=30, required=True)
     joined_date = serializers.DateField(required=True)
     course_group = serializers.PrimaryKeyRelatedField(queryset=CourseGroups.objects.all(), required=True)
 
