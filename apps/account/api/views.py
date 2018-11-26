@@ -10,7 +10,7 @@ from account.models import User
 from location.models import ClassRoom, Area, Region
 from .permissions import IsStaff, IsExecutiveAdmin, IsAdmin, CanEditUser, IsOwner
 from .serializer import (UserModelSerializer, AdminMakeStudentSeriazlier, AdminChangeClassRoomSerializer,
-                         AdminUserModelSerializer)
+						 AdminUserModelSerializer, UserListSerializer)
 
 
 class UserLoginAPIView(views.ObtainAuthToken):
@@ -68,8 +68,14 @@ class AdminUserViewSet(viewsets.ModelViewSet):
     #     else:
     #         return User.objects.none()
 
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+	def get_serializer_class(self):
+		if self.action == 'list':
+			return UserListSerializer
+		else:
+			return AdminUserModelSerializer
+
+	def perform_create(self, serializer):
+		serializer.save(created_by=self.request.user)
 
     @action(detail=False, url_path='classroom/(?P<classroom_id>[0-9]+)', permission_classes=[IsAuthenticated, IsStaff])
     def classroom(self, request, classroom_id=None):

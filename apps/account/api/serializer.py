@@ -6,9 +6,9 @@ from location.models import ClassRoom
 
 
 class UserListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'firstname', 'lastname')
+	class Meta:
+		model = User
+		fields = ('id', 'first_name', 'last_name')
 
 
 class UserModelSerializer(serializers.ModelSerializer):
