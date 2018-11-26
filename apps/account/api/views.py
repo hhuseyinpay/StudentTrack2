@@ -81,7 +81,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
     def classroom(self, request, classroom_id=None):
         qs = User.objects.filter(Q(classroom=classroom_id) | Q(classroom_teacher=classroom_id))
 
-        body = self.get_serializer(qs, many=True).data
+        body = UserListSerializer(qs, many=True).data
         return Response(data=body, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, IsExecutiveAdmin, CanEditUser])
