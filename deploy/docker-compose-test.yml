@@ -2,14 +2,10 @@
 version: '3'
 
 services:
-  # web container, with django + gunicorn
   web:
-    restart: always
-    build:
-        context: ../
-        dockerfile: deploy/Dockerfile
+    image: hhuseyinpay/student-app:dev
     environment:
-      - DJANGO_SETTINGS_MODULE
+      - DJANGO_SETTINGS_MODULE=student.settings
     volumes:
       - ..:/opt/services/student/src
       - static:/opt/services/student/src/static

@@ -2,6 +2,34 @@
 version: '3'
 
 services:
+
+  # web container, with django + gunicorn
+  student_app:
+    restart: always
+    build:
+        context: ../
+        dockerfile: deploy/Dockerfile
+    image: hhuseyinpay/student-app:dev
+    environment:
+      - DJANGO_SETTINGS_MODULE=student.settings
+    volumes:
+      - ..:/opt/services/student/src
+      - static:/opt/services/student/src/static
+      - media:/opt/services/student/src/media
+    #command: /usr/local/bin/gunicorn -c deploy/config/gunicorn-conf.py --reload  --bind 0.0.0.0:8000 --chdir student student.wsgi:application
+    depends_on:
+      - db
+      - redis
+
+  celery:
+    image: hhuseyinpay/student-app:dev
+    entrypoint: bash -c "chmod +x deploy/run_celery.sh && deploy/run_celery.sh"
+    ports:
+      - 5555:5555
+    depends_on:
+      - student_app
+      - redis
+
   # database containers, one for each db
   db:
     image: postgres:10.6-alpine
@@ -15,27 +43,9 @@ services:
   redis:
     image: redis:4.0-alpine
 
-  # web container, with django + gunicorn
-  web:
-    restart: always
-    build:
-        context: ../
-        dockerfile: deploy/Dockerfile
-    environment:
-      - DJANGO_SETTINGS_MODULE
-    volumes:
-      - ..:/opt/services/student/src
-      - static:/opt/services/student/src/static
-      - media:/opt/services/student/src/media
-
-    command: /usr/local/bin/gunicorn -c deploy/config/gunicorn-conf.py --reload  --bind 0.0.0.0:8000 --chdir student student.wsgi:application
-    depends_on:
-      - db
-      - redis
-
   # reverse proxy container (nginx)
   nginx:
-    image: nginx:1.14
+    image: nginx:1.14-alpine
     ports:
       - 80:80
     volumes:
@@ -44,7 +54,7 @@ services:
       - media:/opt/services/student/src/media
 
     depends_on:
-      - web
+      - student_app
 
 volumes:
   db:

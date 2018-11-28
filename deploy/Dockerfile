@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.6
 
 ENV PYTHONUNBUFFERED 1
 RUN mkdir -p /opt/services/student/src
@@ -12,4 +12,5 @@ RUN pip install -r requirements.txt
 RUN python manage.py collectstatic --no-input
 
 EXPOSE 8000
-CMD ["gunicorn", "-c", "deploy/config/gunicorn-conf.py", "--reload","--bind", ":8000", "--chdir", "student", "student.wsgi:application"]
+
+CMD ["gunicorn", "-c", "deploy/config/gunicorn-conf.py", "--reload", "--bind", "0.0.0.0:8000", "--chdir", "student", "student.wsgi:application"]
