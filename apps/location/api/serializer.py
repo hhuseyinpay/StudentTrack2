@@ -17,12 +17,14 @@ class AreaModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Area
         fields = '__all__'
+        extra_kwargs = {'executives': {'read_only': True}, 'region': {'read_only': True}}
 
 
 class ClassRoomModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassRoom
         fields = '__all__'
+        extra_kwargs = {'teachers': {'read_only': True}, 'area': {'read_only': True}}
 
 
 class AreaListSerializer(serializers.ModelSerializer):
