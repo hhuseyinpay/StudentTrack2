@@ -22,3 +22,4 @@ def fill_missing_daily_study():
         for course in u.course_group.courses.all():
             studies.append(Study(daily_study=ds, course=course, begining=0, end=0, amount=0))
         Study.objects.bulk_create(studies)
+    return True
