@@ -24,7 +24,7 @@ class User(AbstractUser):
         (TEACHER, 'Kat Vakfı'),
         (STUDENT, 'Talebe')
     )
-    user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, null=True)
+    user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, null=True, blank=True)
     phone_regex = RegexValidator(regex=r'^(05)[0-9][0-9]([0-9]){7}$',
                                  message="Format hatası. Telefon numarası şu formatta olmalı:'05515524294'")
     phone_number = models.CharField(validators=[phone_regex], max_length=11, blank=True)  # validators should be a list
@@ -50,4 +50,4 @@ class User(AbstractUser):
         return self.user_type == self.STUDENT
 
     def is_new(self):
-        return self.user_type is None
+        return self.user_type is None or (self.user_type == User.STUDENT and self.classroom is None)
