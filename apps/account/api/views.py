@@ -84,7 +84,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         body = UserListSerializer(qs, many=True).data
         return Response(data=body, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, IsExecutiveAdmin, CanEditUser])
+    @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, IsStaff, CanEditUser])
     def makestudent(self, request, pk=None):
         staff = request.user
         user = self.get_object()
