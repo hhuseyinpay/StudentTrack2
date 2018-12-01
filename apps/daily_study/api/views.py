@@ -67,3 +67,12 @@ class AdminDailyStudyViewset(viewsets.ModelViewSet):
 
         body = self.get_serializer(ds, many=True).data
         return Response(body, status=status.HTTP_200_OK)
+
+    @action(detail=True, permission_classes=[IsAuthenticated, CanEditDailyStudy])
+    def invalidate(self, request, pk=None):
+        ds = self.get_object()
+        ds.is_validated = False
+        ds.save()
+
+        body = self.get_serializer(ds, many=True).data
+        return Response(body, status=status.HTTP_200_OK)
