@@ -29,6 +29,18 @@ class CourseGroupViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, views
         body = self.get_serializer(course_group).data
         return Response(data=body, status=status.HTTP_200_OK)
 
+    @action(detail=False)
+    def mycourses(self, request):
+        user = self.request.user
+        if user.course_group:
+            qs = user.course_group.courses.all()
+        else:
+            body = {"detail": "Çetele grubu bulunamadı."}
+            return Response(data=body, status=status.HTTP_404_NOT_FOUND)
+
+        body = CourseModelSerializer(qs, many=True).data
+        return Response(data=body, status=status.HTTP_200_OK)
+
 
 class CourseViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = CourseModelSerializer
