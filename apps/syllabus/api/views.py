@@ -38,7 +38,7 @@ class SyllabusViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
     def contents(self, request, pk=None):
         qs = Content.objects.filter(syllabus=pk)
 
-        body = ContentModelSerializer(qs, many=True)
+        body = ContentModelSerializer(qs, many=True).data
         return Response(data=body, status=status.HTTP_200_OK)
 
 
