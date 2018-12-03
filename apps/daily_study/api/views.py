@@ -1,12 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, status
+from rest_framework import status, mixins
 from rest_framework.decorators import action
-from rest_framework.exceptions import ParseError
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
+from django.shortcuts import get_object_or_404
 
 from account.api.permissions import IsStaff
 from daily_study.models import DailyStudy, Study
@@ -16,7 +17,8 @@ from .serializer import DailyStudyModelSerializer, DailyStudyListSerializer, Adm
 
 User = get_user_model()
 
-class DailyStudyViewset(viewsets.ModelViewSet):
+
+class DailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, GenericViewSet):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated, IsDailyStudyOwner)
     filter_backends = (OrderingFilter, DjangoFilterBackend)
@@ -48,7 +50,7 @@ class DailyStudyViewset(viewsets.ModelViewSet):
         return Response(body, status=status.HTTP_200_OK)
 
 
-class AdminDailyStudyViewset(viewsets.ModelViewSet):
+class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, GenericViewSet):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated, CanEditDailyStudy)
     filter_backends = (OrderingFilter, DjangoFilterBackend)
