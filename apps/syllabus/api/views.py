@@ -65,6 +65,7 @@ class UserSyllabusViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, mix
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class AdminUserSyllabusViewSet(viewsets.ModelViewSet):
     serializer_class = AdminUserSyllabusModelSerializer
     filter_fields = ('user', 'content__syllabus__level', 'content__syllabus__course', 'is_validated')
@@ -74,7 +75,7 @@ class AdminUserSyllabusViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, CanEditSyllabus])
     def validate(self, request, pk=None):
         us = self.get_object()
-        us.is_validate = True
+        us.is_validated = True
         us.validate_time = now()
         us.validator_user = self.request.user
         us.save()
@@ -85,7 +86,7 @@ class AdminUserSyllabusViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, CanEditSyllabus])
     def invalidate(self, request, pk=None):
         us = self.get_object()
-        us.is_validate = False
+        us.is_validated = False
         us.validate_time = now()
         us.validator_user = self.request.user
         us.save()
