@@ -52,7 +52,7 @@ class SyllabusModelSerializer(serializers.ModelSerializer):
 
 
 class UserSyllabusModelSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    # user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = UserSyllabus
