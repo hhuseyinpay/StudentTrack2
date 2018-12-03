@@ -57,6 +57,13 @@ class UserSyllabusViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, mix
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.is_validated:
+            body = {'detail': 'Onaylanmış bir kuru silemezsiniz.'}
+            return Response(data=body, status=status.HTTP_400_BAD_REQUEST)
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class AdminUserSyllabusViewSet(viewsets.ModelViewSet):
     serializer_class = AdminUserSyllabusModelSerializer
