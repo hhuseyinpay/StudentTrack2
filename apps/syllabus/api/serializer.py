@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from rest_framework.fields import CurrentUserDefault
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework import serializers
 
@@ -52,12 +53,12 @@ class SyllabusModelSerializer(serializers.ModelSerializer):
 
 
 class UserSyllabusModelSerializer(serializers.ModelSerializer):
-    # user = serializers.PrimaryKeyRelatedField(read_only=True)
+    user = serializers.HiddenField(default=CurrentUserDefault())
 
     class Meta:
         model = UserSyllabus
         fields = ('id', 'user', 'content', 'is_validated', 'validate_time', 'validator_user')
-        read_only_fields = ('user', 'valdator_user', 'validate_time', 'is_validated')
+        read_only_fields = ('valdator_user', 'validate_time', 'is_validated')
         validators = [
             UniqueTogetherValidator(
                 queryset=UserSyllabus.objects.all(),
