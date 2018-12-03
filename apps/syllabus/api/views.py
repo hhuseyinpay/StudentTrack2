@@ -1,3 +1,4 @@
+from django.utils.timezone import now
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -67,13 +68,25 @@ class AdminUserSyllabusViewSet(viewsets.ModelViewSet):
     def validate(self, request, pk=None):
         us = self.get_object()
         us.is_validate = True
+        us.validate_time = now()
         us.validator_user = self.request.user
         us.save()
 
         body = self.get_serializer(us).data
         return Response(body, status=status.HTTP_200_OK)
 
-    @action(detail=False, url_path='notvalidated/user/(?P<user_id>[0-9]+)',
+    @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, CanEditSyllabus])
+    def invalidate(self, request, pk=None):
+        us = self.get_object()
+        us.is_validate = False
+        us.validate_time = now()
+        us.validator_user = self.request.user
+        us.save()
+
+        body = self.get_serializer(us).data
+        return Response(body, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['put'], url_path='notvalidated/user/(?P<user_id>[0-9]+)',
             permission_classes=[IsAuthenticated, IsStaff])
     def notvalidated(self, request, user_id=None):
         us = UserSyllabus.objects.filter(user=user_id)
