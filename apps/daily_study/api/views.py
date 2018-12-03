@@ -8,7 +8,8 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from daily_study.models import DailyStudy
+from account.api.permissions import IsStaff
+from daily_study.models import DailyStudy, Study
 from daily_study.filters import DailyStudyCreatedDayFilter
 from .permissions import IsDailyStudyOwner, CanEditDailyStudy
 from .serializer import DailyStudyModelSerializer, DailyStudyListSerializer, AdminDailyStudyModelSerializer
@@ -30,18 +31,19 @@ class DailyStudyViewset(viewsets.ModelViewSet):
         else:
             return DailyStudyModelSerializer
 
-    def perform_create(self, serializer):
-        if DailyStudy.objects.filter(user=self.request.user, created_day=now().date()).exists():
-            raise ParseError("Bir günde birden fazla çetele oluşturulamaz.")
-
-        serializer.save(user=self.request.user)
-
     @action(detail=False, permission_classes=[IsAuthenticated])
     def today(self, request):
         ds = self.get_queryset().filter(created_day=now().date())
+        # bugün çetele doldurulmadıysa otomatik olarak boş bir çelete oluştur..
         if not ds:
-            body = {"detail": "Bugün çetele oluşturulmadı."}
-            return Response(data=body, status=status.HTTP_404_NOT_FOUND)
+            user = request.user
+            ds = DailyStudy.objects.create(user=user, created_day=now())
+
+            studies = []
+            for course in user.course_group.courses.all():
+                studies.append(Study(daily_study=ds, course=course, begining=0, end=0, amount=0))
+            Study.objects.bulk_create(studies)
+
         body = self.get_serializer(ds, many=True).data
         return Response(body, status=status.HTTP_200_OK)
 
