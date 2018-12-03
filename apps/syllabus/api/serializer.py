@@ -56,8 +56,8 @@ class UserSyllabusModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserSyllabus
-        fields = ('id', 'user', 'content', 'is_validated', 'validator_user')
-        read_only_fields = ('valdator_user', 'is_validated')
+        fields = ('id', 'user', 'content', 'is_validated', 'validate_time', 'validator_user')
+        read_only_fields = ('user', 'valdator_user', 'validate_time', 'is_validated')
         validators = [
             UniqueTogetherValidator(
                 queryset=UserSyllabus.objects.all(),

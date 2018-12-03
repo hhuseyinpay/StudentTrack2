@@ -59,6 +59,7 @@ class UserSyllabus(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     is_validated = models.BooleanField(default=False)
+    validate_time = models.DateTimeField(blank=True, null=True)
     validator_user = models.ForeignKey(User, related_name='syllabus_validator_user',
                                        on_delete=models.CASCADE, blank=True, null=True, db_index=False)
 
