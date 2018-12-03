@@ -57,7 +57,7 @@ class AdminDailyStudyViewset(viewsets.ModelViewSet):
         else:
             return AdminDailyStudyModelSerializer
 
-    @action(detail=True, permission_classes=[IsAuthenticated, CanEditDailyStudy])
+    @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, CanEditDailyStudy])
     def validate(self, request, pk=None):
         ds = self.get_object()
         ds.is_validated = True
@@ -68,7 +68,7 @@ class AdminDailyStudyViewset(viewsets.ModelViewSet):
         body = self.get_serializer(ds, many=True).data
         return Response(body, status=status.HTTP_200_OK)
 
-    @action(detail=True, permission_classes=[IsAuthenticated, CanEditDailyStudy])
+    @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, CanEditDailyStudy])
     def invalidate(self, request, pk=None):
         ds = self.get_object()
         ds.is_validated = False
