@@ -42,16 +42,8 @@ class SyllabusListSerializer(serializers.ModelSerializer):
         fields = ('id', 'level', 'course')
 
 
-class ContentModelSerializer_OLD(serializers.ModelSerializer):
-    # id = serializers.IntegerField(required=False)
-
-    class Meta:
-        model = Content
-        fields = ('id', 'week', 'name', 'description')
-
-
 class SyllabusModelSerializer(serializers.ModelSerializer):
-    contents = ContentModelSerializer_OLD(required=True, many=True)
+    contents = ContentModelSerializer(required=True, many=True)
     course = CourseSerializer()
 
     class Meta:
