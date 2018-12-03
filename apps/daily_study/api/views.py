@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
@@ -12,6 +13,7 @@ from daily_study.filters import DailyStudyCreatedDayFilter
 from .permissions import IsDailyStudyOwner, CanEditDailyStudy
 from .serializer import DailyStudyModelSerializer, DailyStudyListSerializer, AdminDailyStudyModelSerializer
 
+User = get_user_model()
 
 class DailyStudyViewset(viewsets.ModelViewSet):
     serializer_class = DailyStudyModelSerializer
@@ -56,6 +58,22 @@ class AdminDailyStudyViewset(viewsets.ModelViewSet):
             return DailyStudyListSerializer
         else:
             return AdminDailyStudyModelSerializer
+
+    @action(detail=False, url_path='today/user/(?P<user_id>[0-9]+)', permission_classes=[IsAuthenticated, IsStaff])
+    def today(self, request, user_id=None):
+        ds = self.get_queryset().filter(user=user_id, created_day=now().date())
+        # bugün çetele doldurulmadıysa otomatik olarak boş bir çelete oluştur..
+        if not ds:
+            user = get_object_or_404(User.objects.all(), pk=user_id)
+            ds = DailyStudy.objects.create(user=user_id, created_day=now())
+
+            studies = []
+            for course in user.course_group.courses.all():
+                studies.append(Study(daily_study=ds, course=course, begining=0, end=0, amount=0))
+            Study.objects.bulk_create(studies)
+
+        body = self.get_serializer(ds, many=True).data
+        return Response(body, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, CanEditDailyStudy])
     def validate(self, request, pk=None):
