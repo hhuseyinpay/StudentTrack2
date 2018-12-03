@@ -68,34 +68,3 @@ class UserSyllabusModelSerializer(serializers.ModelSerializer):
 
 class AdminUserSyllabusModelSerializer(UserSyllabusModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-
-
-class UserSyllabusNotValidatedSerializer(serializers.ModelSerializer):
-    content = ContentModelSerializer_OLD()
-
-    class Meta:
-        model = UserSyllabus
-        fields = ('id', 'user', 'content', 'is_validated', 'validator_user')
-
-
-class UserSyllabusValidateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserSyllabus
-        fields = ('id', 'is_validated', 'validator_user')
-        read_only_fields = ('id', 'validator_user')
-
-    def update(self, instance, validated_data):
-        validate = validated_data.get('is_validated')
-
-        # daha önce onaylanmadıysa ve şimdi onaylanıyorsa
-        if not instance.is_validated and validate:
-            instance.is_validated = True
-            instance.validator_user = self.context['user']
-
-        # daha önce onaylandıysa ve onay kaldırılıyorsa
-        elif instance.is_validated and not validate:
-            instance.is_validated = False
-            instance.validator_user = self.context['user']
-
-        instance.save()
-        return instance
