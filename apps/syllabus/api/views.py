@@ -94,7 +94,7 @@ class AdminUserSyllabusViewSet(viewsets.ModelViewSet):
         body = self.get_serializer(us).data
         return Response(body, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['put'], url_path='notvalidated/user/(?P<user_id>[0-9]+)',
+    @action(detail=False, url_path='notvalidated/user/(?P<user_id>[0-9]+)',
             permission_classes=[IsAuthenticated, IsStaff])
     def notvalidated(self, request, user_id=None):
         us = UserSyllabus.objects.filter(user=user_id)
