@@ -35,10 +35,13 @@ class DailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixi
 
     @action(detail=False, permission_classes=[IsAuthenticated])
     def today(self, request):
+        user = request.user
+        if not user.has_group():
+            body = {'detail': 'Herhangi bir çetele grubuna dahil değilsiniz!'}
+            return Response(body, status=status.HTTP_400_BAD_REQUEST)
         ds = self.get_queryset().filter(created_day=now().date())
         # bugün çetele doldurulmadıysa otomatik olarak boş bir çelete oluştur..
         if not ds:
-            user = request.user
             ds = DailyStudy.objects.create(user=user, created_day=now())
 
             studies = []
@@ -65,6 +68,10 @@ class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
 
     @action(detail=False, url_path='today/user/(?P<user_id>[0-9]+)', permission_classes=[IsAuthenticated, IsStaff])
     def today(self, request, user_id=None):
+        user = get_object_or_404(User, pk=user_id)
+        if not user.has_group():
+            body = {'detail': 'Herhangi bir çetele grubuna dahil değil!'}
+            return Response(body, status=status.HTTP_400_BAD_REQUEST)
         ds = self.get_queryset().filter(user=user_id, created_day=now().date())
         # bugün çetele doldurulmadıysa otomatik olarak boş bir çelete oluştur..
         if not ds:
