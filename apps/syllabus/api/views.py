@@ -68,7 +68,7 @@ class UserSyllabusViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, mix
 
 class AdminUserSyllabusViewSet(viewsets.ModelViewSet):
     serializer_class = AdminUserSyllabusModelSerializer
-    filter_fields = ('user', 'content__syllabus', 'is_validated')
+    filter_fields = ('user', 'user__classroom', 'content__syllabus', 'is_validated')
     permission_classes = (IsAuthenticated, CanEditSyllabus)
     queryset = UserSyllabus.objects.all()
 
