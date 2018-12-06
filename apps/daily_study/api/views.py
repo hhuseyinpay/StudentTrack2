@@ -46,7 +46,7 @@ class DailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixi
                 studies.append(Study(daily_study=ds, course=course, begining=0, end=0, amount=0))
             Study.objects.bulk_create(studies)
 
-        body = self.get_serializer(ds, many=True).data
+        body = self.get_serializer(ds).data
         return Response(body, status=status.HTTP_200_OK)
 
 
@@ -76,7 +76,7 @@ class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
                 studies.append(Study(daily_study=ds, course=course, begining=0, end=0, amount=0))
             Study.objects.bulk_create(studies)
 
-        body = self.get_serializer(ds, many=True).data
+        body = self.get_serializer(ds).data
         return Response(body, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, CanEditDailyStudy])
