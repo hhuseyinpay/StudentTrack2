@@ -42,7 +42,7 @@ class DailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixi
         ds = self.get_queryset().filter(created_day=now().date())
         # bugün çetele doldurulmadıysa otomatik olarak boş bir çelete oluştur..
         if not ds:
-            ds = DailyStudy.objects.create(user=user, created_day=now())
+            ds = DailyStudy.objects.create(user=user, created_day=now().date())
 
             studies = []
             for course in user.course_group.courses.all():
@@ -77,7 +77,7 @@ class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
         # bugün çetele doldurulmadıysa otomatik olarak boş bir çelete oluştur..
         if not ds:
             user = get_object_or_404(User.objects.all(), pk=user_id)
-            ds = DailyStudy.objects.create(user=user_id, created_day=now())
+            ds = DailyStudy.objects.create(user=user_id, created_day=now().date())
 
             studies = []
             for course in user.course_group.courses.all():
