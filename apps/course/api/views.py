@@ -32,7 +32,7 @@ class CourseGroupViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, views
     @action(detail=False)
     def mycourses(self, request):
         user = self.request.user
-        if user.course_group:
+        if not user.has_group():
             qs = user.course_group.courses.all()
         else:
             body = {"detail": "Çetele grubu bulunamadı."}

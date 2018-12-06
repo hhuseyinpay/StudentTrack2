@@ -51,3 +51,6 @@ class User(AbstractUser):
 
     def is_new(self):
         return self.user_type is None or (self.user_type == User.STUDENT and self.classroom is None)
+
+    def has_group(self):
+        return self.course_group is not None
