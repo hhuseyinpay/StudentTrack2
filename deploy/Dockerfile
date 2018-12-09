@@ -3,11 +3,10 @@ FROM python:3.6
 ENV PYTHONUNBUFFERED 1
 RUN mkdir -p /opt/services/student/src
 
+ADD requirements.txt /opt/services/student/src/
 WORKDIR /opt/services/student/src
-COPY . /opt/services/student/src
-
-
 RUN pip install -r requirements.txt
+COPY . /opt/services/student/src
 
 RUN python manage.py collectstatic --no-input
 
