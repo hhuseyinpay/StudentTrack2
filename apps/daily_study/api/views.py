@@ -96,7 +96,7 @@ class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
         ds.validate_time = now()
         ds.save()
 
-        body = self.get_serializer(ds, many=True).data
+        body = self.get_serializer(ds).data
         return Response(body, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, CanEditDailyStudy])
@@ -105,5 +105,5 @@ class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
         ds.is_validated = False
         ds.save()
 
-        body = self.get_serializer(ds, many=True).data
+        body = self.get_serializer(ds).data
         return Response(body, status=status.HTTP_200_OK)
