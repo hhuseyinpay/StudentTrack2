@@ -1,6 +1,8 @@
 import os
 import sys
 
+from celery.schedules import crontab
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
@@ -199,6 +201,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Istanbul'
 CELERY_BEAT_SCHEDULE = {
     'fill-missing-daily-study': {
-        'task': 'daily_study.tasks.fill_missing_daily_study'
+        'task': 'daily_study.tasks.fill_missing_daily_study',
+        'schedule': crontab(minute=1, hour=00)
     }
 }
