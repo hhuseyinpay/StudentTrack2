@@ -49,7 +49,7 @@ class DailyStudyModelSerializer(serializers.ModelSerializer):
 class DailyStudyListSerializer(serializers.ModelSerializer):
     class Meta:
         model = DailyStudy
-        fields = ('id', 'created_day', 'is_validated')
+        fields = ('id', 'user', 'created_day', 'is_validated')
 
 
 class AdminDailyStudyModelSerializer(DailyStudyModelSerializer):
