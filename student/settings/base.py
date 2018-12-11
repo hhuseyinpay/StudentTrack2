@@ -200,8 +200,8 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Istanbul'
 CELERY_BEAT_SCHEDULE = {
-    'fill-missing-daily-study': {
-        'task': 'daily_study.tasks.fill_missing_daily_study',
-        'schedule': crontab(minute=1, hour=00)
+    'fill-today-daily-study': {
+        'task': 'daily_study.tasks.fill_today_daily_study',
+        'schedule': crontab(minute=0, hour=00)
     }
 }

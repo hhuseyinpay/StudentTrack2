@@ -23,3 +23,21 @@ def fill_missing_daily_study():
             studies.append(Study(daily_study=ds, course=course, begining=0, end=0, amount=0))
         Study.objects.bulk_create(studies)
     return True
+
+
+@shared_task
+def fill_today_daily_study():
+    today = now().date()
+    students = User.objects \
+        .filter(user_type=User.STUDENT) \
+        .only('id', 'course_group') \
+        .prefetch_related('course_group__courses')
+
+    for student in students:
+        ds = DailyStudy.objects.create(user=student, created_day=today)
+
+        studies = []
+        for course in student.course_group.courses.all():
+            studies.append(Study(daily_study=ds, course=course, begining=0, end=0, amount=0))
+        Study.objects.bulk_create(studies)
+    return True
