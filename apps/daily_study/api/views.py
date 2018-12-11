@@ -39,7 +39,7 @@ class DailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixi
         if not user.has_group():
             body = {'detail': 'Herhangi bir çetele grubuna dahil değilsiniz!'}
             return Response(body, status=status.HTTP_400_BAD_REQUEST)
-        ds = self.get_queryset().filter(created_day=now().date())
+        ds = get_object_or_404(DailyStudy, user=user, created_day=now().date())
         body = self.get_serializer(ds, many=True).data
         return Response(body, status=status.HTTP_200_OK)
 
@@ -63,7 +63,7 @@ class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
         if not user.has_group():
             body = {'detail': 'Herhangi bir çetele grubuna dahil değil!'}
             return Response(body, status=status.HTTP_400_BAD_REQUEST)
-        ds = self.get_queryset().filter(user=user_id, created_day=now().date())
+        ds = get_object_or_404(DailyStudy, user=user, created_day=now().date())
         body = self.get_serializer(ds, many=True).data
         return Response(body, status=status.HTTP_200_OK)
 
