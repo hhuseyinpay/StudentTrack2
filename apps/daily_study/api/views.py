@@ -10,7 +10,7 @@ from rest_framework.viewsets import GenericViewSet
 from django.shortcuts import get_object_or_404
 
 from account.api.permissions import IsStaff
-from daily_study.models import DailyStudy, Study
+from daily_study.models import DailyStudy
 from daily_study.filters import DailyStudyCreatedDayFilter
 from .permissions import IsDailyStudyOwner, CanEditDailyStudy
 from .serializer import DailyStudyModelSerializer, DailyStudyListSerializer, AdminDailyStudyModelSerializer
@@ -40,17 +40,7 @@ class DailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixi
             body = {'detail': 'Herhangi bir çetele grubuna dahil değilsiniz!'}
             return Response(body, status=status.HTTP_400_BAD_REQUEST)
         ds = self.get_queryset().filter(created_day=now().date())
-        # bugün çetele doldurulmadıysa otomatik olarak boş bir çelete oluştur..
-        if not ds:
-            ds = DailyStudy.objects.create(user=user, created_day=now().date())
-
-            studies = []
-            for course in user.course_group.courses.all():
-                studies.append(Study(daily_study=ds, course=course, begining=0, end=0, amount=0))
-            Study.objects.bulk_create(studies)
-            body = self.get_serializer(ds).data
-        else:
-            body = self.get_serializer(ds, many=True).data
+        body = self.get_serializer(ds, many=True).data
         return Response(body, status=status.HTTP_200_OK)
 
 
@@ -74,18 +64,7 @@ class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
             body = {'detail': 'Herhangi bir çetele grubuna dahil değil!'}
             return Response(body, status=status.HTTP_400_BAD_REQUEST)
         ds = self.get_queryset().filter(user=user_id, created_day=now().date())
-        # bugün çetele doldurulmadıysa otomatik olarak boş bir çelete oluştur..
-        if not ds:
-            user = get_object_or_404(User.objects.all(), pk=user_id)
-            ds = DailyStudy.objects.create(user=user_id, created_day=now().date())
-
-            studies = []
-            for course in user.course_group.courses.all():
-                studies.append(Study(daily_study=ds, course=course, begining=0, end=0, amount=0))
-            Study.objects.bulk_create(studies)
-            body = self.get_serializer(ds).data
-        else:
-            body = self.get_serializer(ds, many=True).data
+        body = self.get_serializer(ds, many=True).data
         return Response(body, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, CanEditDailyStudy])
