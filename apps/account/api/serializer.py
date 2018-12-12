@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from account.models import User
 from course.models import CourseGroups
@@ -13,7 +14,11 @@ class UserListSerializer(serializers.ModelSerializer):
 
 class UserModelSerializer(serializers.ModelSerializer):
     # user_type = serializers.CharField(source='get_user_type_display', read_only=True)
-    username = serializers.CharField(min_length=3, max_length=30, required=True)
+    username = serializers.CharField(min_length=3, max_length=30, required=True,
+                                     validators=[UniqueValidator(
+                                         queryset=User.objects.all(),
+                                         message='Bu kullanıcı adını başka kardeş kullanıyor.'
+                                     )])
     first_name = serializers.CharField(min_length=3, max_length=30, required=True)
     last_name = serializers.CharField(min_length=3, max_length=30, required=True)
     password = serializers.CharField(min_length=3, max_length=30, write_only=True, required=False)
