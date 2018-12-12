@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
+from rest_framework import serializers
 from rest_framework.fields import CurrentUserDefault
 from rest_framework.validators import UniqueTogetherValidator
-from rest_framework import serializers
 
-from ..models import Content, Syllabus, UserSyllabus
 from course.models import Course
+from ..models import Content, Syllabus, UserSyllabus
 
 User = get_user_model()
 
@@ -62,7 +62,8 @@ class UserSyllabusModelSerializer(serializers.ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset=UserSyllabus.objects.all(),
-                fields=('user', 'content')
+                fields=('user', 'content'),
+                message='Aynı kurdan birden fazla oluşturulamaz.'
             )
         ]
 
