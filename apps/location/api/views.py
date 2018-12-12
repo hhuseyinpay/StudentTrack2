@@ -166,3 +166,20 @@ class AdminAreaViewset(viewsets.ModelViewSet):
 
         body = self.get_serializer(self.get_object()).data
         return Response(data=body, status=status.HTTP_200_OK)
+
+
+class AdminRegionViewset(viewsets.GenericViewSet):
+    serializer_class = RegionModelSerializer
+    permission_classes = (IsAuthenticated, IsExecutiveAdmin, CanEditArea)
+    queryset = Region.objects.all()
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated, IsExecutiveAdmin])
+    def myregion(self, request):
+        staff = request.user
+        if staff.is_executive():
+            region = Region.objects.filter(area__executives=staff).first()
+        else:
+            region = Region.objects.filter(admins=staff).first()
+
+        body = AreaListSerializer(region).data
+        return Response(body, status=status.HTTP_200_OK)

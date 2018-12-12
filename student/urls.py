@@ -13,23 +13,22 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import include
-from django.urls import path
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
-from rest_framework import permissions
-
-from drf_yasg.views import get_schema_view
+from django.urls import include
+from django.urls import path
 from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
 from rest_framework.routers import SimpleRouter
 
-from account.api.views import UserViewSet, UserLoginAPIView, AdminUserViewSet
 from course.api.views import CourseGroupViewset, CourseViewSet
 from daily_study.api.views import DailyStudyViewset, AdminDailyStudyViewset
-from location.api.views import ClassRoomRetrieveViewSet, AreaRetrieveViewSet, AdminClassroomViewSet, AdminAreaViewset, \
-    RegionRetrieveViewSet
+from account.api.views import UserViewSet, UserLoginAPIView, AdminUserViewSet
 from syllabus.api.views import SyllabusViewSet, UserSyllabusViewSet, AdminUserSyllabusViewSet, ContentViewSet
+from location.api.views import ClassRoomRetrieveViewSet, AreaRetrieveViewSet, AdminClassroomViewSet, AdminAreaViewset, \
+    RegionRetrieveViewSet, AdminRegionViewset
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -42,7 +41,7 @@ schema_view = get_schema_view(
     ),
     validators=['flex', 'ssv'],
     public=True,
-    permission_classes=(permissions.IsAuthenticated,),
+    permission_classes=(permissions.AllowAny,),
 )
 admin_router = SimpleRouter()
 user_router = SimpleRouter()
@@ -63,7 +62,7 @@ user_router.register('region', RegionRetrieveViewSet, 'regionretrieve-viewset')
 
 admin_router.register('classroom', AdminClassroomViewSet, 'adminclassroom-viewset')
 admin_router.register('area', AdminAreaViewset, 'adminarea-viewset')
-
+admin_router.register('region', AdminRegionViewset, 'adminregion-viewset')
 ###
 # course app
 ###
