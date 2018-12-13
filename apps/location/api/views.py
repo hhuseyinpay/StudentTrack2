@@ -139,7 +139,7 @@ class AdminAreaViewset(viewsets.ModelViewSet):
         area = self.get_object()
         teachers = User.objects.filter(classroom_teacher__area=area)
 
-        body = UserModelSerializer(teachers)
+        body = UserModelSerializer(teachers, many=True).data
         return Response(data=body, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, IsExecutiveAdmin])
