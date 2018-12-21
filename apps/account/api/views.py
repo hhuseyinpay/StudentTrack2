@@ -122,6 +122,9 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         user.user_type = User.TEACHER
         user.save()
 
+        # executivese
+        Area.objects.filter(executives=user).delete()
+
         body = self.get_serializer(user).data
         return Response(data=body, status=status.HTTP_200_OK)
 
@@ -131,6 +134,9 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         user.classroom = None
         user.user_type = User.EXECUTIVE
         user.save()
+
+        # teachersa
+        ClassRoom.objects.filter(teachers=user).delete()
 
         body = self.get_serializer(user).data
         return Response(data=body, status=status.HTTP_200_OK)
