@@ -11,7 +11,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from account.api.permissions import IsStaff
 from daily_study.filters import DailyStudyCreatedDayFilter
-from daily_study.models import DailyStudy
+from daily_study.models import DailyStudy, Study
 from .permissions import IsDailyStudyOwner, CanEditDailyStudy
 from .serializer import DailyStudyModelSerializer, DailyStudyListSerializer, AdminDailyStudyModelSerializer
 
@@ -39,7 +39,16 @@ class DailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixi
         if not user.has_group():
             body = {'detail': 'Herhangi bir çetele grubuna dahil değilsiniz!'}
             return Response(body, status=status.HTTP_400_BAD_REQUEST)
-        ds = get_object_or_404(DailyStudy, user=user, created_day=now().date())
+        try:
+            ds = DailyStudy.objects.get(user=user, created_day=now().date())
+        except DailyStudy.DoesNotExist:
+            ds = DailyStudy.objects.create(user=user, created_day=now().date())
+
+            studies = []
+            for course in user.course_group.courses.all():
+                studies.append(Study(daily_study=ds, course=course, begining=0, end=0, amount=0))
+            Study.objects.bulk_create(studies)
+
         body = self.get_serializer(ds).data
         return Response(body, status=status.HTTP_200_OK)
 
@@ -63,7 +72,17 @@ class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
         if not user.has_group():
             body = {'detail': 'Herhangi bir çetele grubuna dahil değil!'}
             return Response(body, status=status.HTTP_400_BAD_REQUEST)
-        ds = get_object_or_404(DailyStudy, user=user, created_day=now().date())
+
+        try:
+            ds = DailyStudy.objects.get(user=user, created_day=now().date())
+        except DailyStudy.DoesNotExist:
+            ds = DailyStudy.objects.create(user=user, created_day=now().date())
+
+            studies = []
+            for course in user.course_group.courses.all():
+                studies.append(Study(daily_study=ds, course=course, begining=0, end=0, amount=0))
+            Study.objects.bulk_create(studies)
+
         body = self.get_serializer(ds).data
         return Response(body, status=status.HTTP_200_OK)
 
