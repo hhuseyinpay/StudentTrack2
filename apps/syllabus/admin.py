@@ -3,9 +3,13 @@ from django.contrib import admin
 from .models import UserSyllabus, Content, Syllabus
 
 
+class ContentAdmin(admin.StackedInline):
+    model = Content
+
+
 @admin.register(Syllabus)
 class SyllabusAdmin(admin.ModelAdmin):
-    inlines = [Content]
+    inlines = [ContentAdmin]
 
 
 admin.site.register(Content)
