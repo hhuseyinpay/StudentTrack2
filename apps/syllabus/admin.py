@@ -5,7 +5,7 @@ from .models import UserSyllabus, Content, Syllabus
 
 @admin.register(Syllabus)
 class SyllabusAdmin(admin.ModelAdmin):
-    filter_horizontal = ('contents',)
+    inlines = [Content]
 
 
 admin.site.register(Content)
