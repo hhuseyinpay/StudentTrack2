@@ -109,8 +109,10 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         user.save()
 
         # teacher veya executive'se sil.
-        ClassRoom.objects.filter(teachers=user).delete()
-        Area.objects.filter(executives=user).delete()
+        user.classroom_teacher.clear()
+        user.area_executive.clear()
+        # ClassRoom.objects.filter(teachers=user).delete()
+        # Area.objects.filter(executives=user).delete()
 
         body = self.get_serializer(user).data
         return Response(data=body, status=status.HTTP_200_OK)
@@ -123,7 +125,8 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         user.save()
 
         # executivese
-        Area.objects.filter(executives=user).delete()
+        # Area.objects.filter(executives=user).delete()
+        user.area_executive.clear()
 
         body = self.get_serializer(user).data
         return Response(data=body, status=status.HTTP_200_OK)
@@ -136,7 +139,8 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         user.save()
 
         # teachersa
-        ClassRoom.objects.filter(teachers=user).delete()
+        # ClassRoom.objects.filter(teachers=user).delete()
+        user.classroom_teacher.clear()
 
         body = self.get_serializer(user).data
         return Response(data=body, status=status.HTTP_200_OK)
