@@ -17,5 +17,14 @@ from .models import DailyStudy, Study
 #   fields = ('date',)
 
 admin.site.register(Study)
-admin.site.register(DailyStudy)
+#admin.site.register(DailyStudy)
 
+
+class StudyAdmin(admin.StackedInline):
+    model = Study
+
+
+@admin.register(DailyStudy)
+class DailyStudyAdmin(admin.ModelAdmin):
+    inlines = [StudyAdmin]
+    max_num = 10
