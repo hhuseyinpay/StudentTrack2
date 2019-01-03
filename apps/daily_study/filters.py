@@ -1,5 +1,4 @@
-from django_filters import DateFilter, BooleanFilter
-from django_filters.rest_framework import FilterSet
+from django_filters.rest_framework import FilterSet, BooleanFilter, DateFilter
 
 from daily_study.models import DailyStudy
 
@@ -23,7 +22,6 @@ class DailyStudyCreatedDayFilter(FilterSet):
         Otomatik eklenen dailystudyler student tarafından update edildikten sonra onay ekranına düşecek..
         """
         if value == False:
-
             return queryset.filter(updated__isnull=False, is_validated=False)
         else:
             return queryset
