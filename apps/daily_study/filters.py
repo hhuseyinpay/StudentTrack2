@@ -9,6 +9,10 @@ class DailyStudyCreatedDayFilter(FilterSet):
     end = DateFilter(field_name='created_day', lookup_expr='lte')
     is_validated = BooleanFilter(method='is_validated_filter')
 
+    class Meta:
+        model = DailyStudy
+        fields = {'begining', 'end', 'is_validated', 'user', 'user__classroom', 'user__classroom__area'}
+
     def is_validated_filter(self, queryset, name, value):
         """
         student dailystudyleri gece otomatik oluşturuluyor ve is_validated false oluyor.
@@ -23,7 +27,3 @@ class DailyStudyCreatedDayFilter(FilterSet):
             return queryset.filter(updated__isnull=False, is_validated=False)
         else:
             return queryset
-
-    class Meta:
-        model = DailyStudy
-        fields = {'begining', 'end', 'is_validated', 'user', 'user__classroom', 'user__classroom__area'}
