@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from django_filters.rest_framework import DjangoFilterBackend
@@ -105,3 +106,38 @@ class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
 
         body = self.get_serializer(ds).data
         return Response(body, status=status.HTTP_200_OK)
+
+    @action(detail=False, permission_classes=[IsAuthenticated, IsStaff])
+    def total(self, request, *args, **kwargs):
+        user = request.query_params.get('user', None)
+        begining = request.query_params.get('begining', None)
+        end = request.query_params.get('end', None)
+        is_validated = request.query_params.get('is_validated', None)
+
+        if not user or not begining or not end or not is_validated:
+            body = {'detail': 'Onay durumu, talebe, başlangıç tarihi veya bitiş tarihi seçilmedi !!'}
+            return Response(body, status=status.HTTP_400_BAD_REQUEST)
+
+        body = {
+            "studies": [
+            ]
+        }
+
+        queryset = self.filter_queryset(self.get_queryset())
+        studies = Study.objects.filter(daily_study__in=queryset)
+        user = get_object_or_404(User, pk=user)
+
+        for course in user.course_group.courses.values_list('id', flat=True):
+            b = {
+                "course": course,
+                "begining": 0,
+                "end": 0,
+                "amount": studies.filter(course=course).aggregate(total=Sum('amount'))['total'] or 0
+            }
+
+            body["studies"].append(b)
+        # hangi sorguların yapıldığını kontrol etmek için:
+        # from django.db import connection
+        # print(connection.queries)
+
+        return Response(body)
