@@ -16,7 +16,7 @@ services:
       - ..:/opt/services/student/src
       - static:/opt/services/student/src/static
       - media:/opt/services/student/src/media
-    #command: /usr/local/bin/gunicorn -c deploy/config/gunicorn-conf.py --reload  --bind 0.0.0.0:8000 --chdir student student.wsgi:application
+    command: /usr/local/bin/gunicorn -c deploy/config/gunicorn-conf.py --bind 0.0.0.0:8000 --chdir student student.wsgi:application
     depends_on:
       - db
       - redis
@@ -38,7 +38,7 @@ services:
     env_file:
       - config/db
     ports:
-      - 5432:5432
+      - 5433:5432
 
   redis:
     image: redis:4.0-alpine

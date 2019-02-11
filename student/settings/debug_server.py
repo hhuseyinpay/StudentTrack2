@@ -10,15 +10,15 @@ MIDDLEWARE += [
     'silk.middleware.SilkyMiddleware',
 ]
 
-"""
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'tts',
+        'USER': 'power_user',
+        'PASSWORD': '1',
+        'HOST': 'localhost',
         'PORT': '',
     }
 }
-"""
+
