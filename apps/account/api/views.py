@@ -163,3 +163,10 @@ class AdminUserViewSet(viewsets.ModelViewSet):
 
         body = self.get_serializer(user).data
         return Response(data=body, status=status.HTTP_200_OK)
+
+
+#########
+
+class Kayit(views.APIView):
+    def post(self, request, format=None):
+        return Response()

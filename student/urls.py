@@ -25,7 +25,7 @@ from rest_framework.routers import SimpleRouter
 
 from course.api.views import CourseGroupViewset, CourseViewSet
 from daily_study.api.views import DailyStudyViewset, AdminDailyStudyViewset
-from account.api.views import UserViewSet, UserLoginAPIView, AdminUserViewSet
+from account.api.views import UserViewSet, UserLoginAPIView, AdminUserViewSet, Kayit
 from syllabus.api.views import SyllabusViewSet, UserSyllabusViewSet, AdminUserSyllabusViewSet, ContentViewSet
 from location.api.views import ClassRoomRetrieveViewSet, AreaRetrieveViewSet, AdminClassroomViewSet, AdminAreaViewset, \
     RegionRetrieveViewSet, AdminRegionViewset
@@ -94,8 +94,8 @@ urlpatterns = [
 
     path('api/', include(user_router.urls)),
     path('api/admin/', include(admin_router.urls)),
-    path('api/login', UserLoginAPIView.as_view(), name='api-login')
-
+    path('api/login', UserLoginAPIView.as_view(), name='api-login'),
+    path('api/kayit', Kayit.as_view())
     # path('reports/', include('reports.urls')),
     # path('api/reports/', include('reports.api.urls'))
 ]
