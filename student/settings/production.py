@@ -1,5 +1,11 @@
 from .base import *
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
+sentry_sdk.init(
+    dsn="https://086dec006bf6402587d9e5e7ac7b4af6@sentry.io/1324498",
+    integrations=[DjangoIntegration()]
+)
 DEBUG = False
 
 INSTALLED_APPS += [
@@ -16,7 +22,7 @@ DATABASES = {
         'NAME': 'tts',
         'USER': 'tts-db-user',
         'PASSWORD': '1',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '',
         'CONN_MAX_AGE': 60 * 10,  # 10 minutes
     }
