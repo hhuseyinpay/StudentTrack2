@@ -168,6 +168,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
 #########
 
 class Kayit(views.APIView):
-    permission_classes = AllowAny()
+    permission_classes = (AllowAny,)
+
     def post(self, request, format=None):
         return Response()
