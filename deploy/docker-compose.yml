@@ -48,6 +48,7 @@ services:
     image: nginx:1.14-alpine
     ports:
       - 80:80
+      - 1899:80
     volumes:
       - ./config/conf.d:/etc/nginx/conf.d
       - static:/opt/services/student/src/static
