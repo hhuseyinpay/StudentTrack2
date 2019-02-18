@@ -54,19 +54,19 @@ class AdminUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     filter_fields = ('classroom',)
 
-    # def get_queryset(self):
-    #     staff = self.request.user
-    #     if staff.is_teacher():
-    #         classrooms = ClassRoom.objects.filter(teachers=staff)
-    #         return User.objects.filter(classroom__in=classrooms)
-    #     elif staff.is_executive():
-    #         areas = Area.objects.filter(executives=staff)
-    #         return User.objects.filter(classroom__area__in=areas)
-    #     elif staff.is_admin():
-    #         regions = Region.objects.filter(admins=staff)
-    #         return User.objects.filter(classroom__area__region__in=regions)
-    #     else:
-    #         return User.objects.none()
+    def get_queryset(self):
+        staff = self.request.user
+        if staff.is_teacher():
+            classrooms = ClassRoom.objects.filter(teachers=staff)
+            return User.objects.filter(classroom__in=classrooms)
+        elif staff.is_executive():
+            areas = Area.objects.filter(executives=staff)
+            return User.objects.filter(classroom__area__in=areas)
+        elif staff.is_admin():
+            regions = Region.objects.filter(admins=staff)
+            return User.objects.filter(classroom__area__region__in=regions)
+        else:
+            return User.objects.none()
 
     def get_serializer_class(self):
         if self.action == 'list':
