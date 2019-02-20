@@ -164,6 +164,30 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         body = self.get_serializer(user).data
         return Response(data=body, status=status.HTTP_200_OK)
 
+    @action(detail=False, permission_classes=[IsAuthenticated, IsExecutiveAdmin])
+    def getallmyuser(self, request):
+        """
+        burayı normalde get_queryset()'i override ederek yazacaktık ancak her api call'da bu filtrenin çalışacaktı.
+        bunun önüne geçmek için yetkili olduğu userları çekebilmek için bu endpoint kullanılacak
+        """
+        staff = self.request.user
+        users = User.objects.none()
+
+        if staff.is_teacher():
+            classrooms = ClassRoom.objects.filter(teachers=staff)
+            users = User.objects.filter(classroom__in=classrooms)
+        elif staff.is_executive():
+            areas = Area.objects.filter(executives=staff).all()
+            users = User.objects.filter(Q(classroom__area__in=areas) |
+                                        Q(classroom_teacher__area__in=areas)).distinct()
+        elif staff.is_admin():
+            regions = Region.objects.filter(admins=staff)
+            users = User.objects.filter(Q(classroom__area__region__in=regions) |
+                                        Q(classroom_teacher__area__region__in=regions) |
+                                        Q(area_executive__region__in=regions)).distinct()
+
+        body = UserListSerializer(users, many=True).data
+        return Response(data=body, status=status.HTTP_200_OK)
 
 #########
 
