@@ -1,0 +1,86 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:10.6-alpine
+    volumes:
+      - db-data:/var/lib/postgresql/data
+        #- /etc/localtime:/etc/localtime:ro
+    ports:
+      - 1900:5432
+    environment:
+      TZ: "Europe/Istanbul"
+      PGTZ: 'GMT+3'
+    env_file: .env
+
+  app:
+    restart: always
+    build: ./
+    volumes:
+      - ./:/app
+      - static-volume:/app/static
+      - media-volume:/app/media
+        #- /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - redis
+      - postgres
+    env_file: .env
+    ports:
+      - 8000:8000
+
+    #command: >
+    #  bash -c "python  ./manage.py migrate &&
+    #                   ./manage.py runserver 0.0.0.0:8000"
+    command: >
+      bash -c "./manage.py collectstatic --no-input &&
+               ./manage.py migrate &&
+               ./manage.py runserver 0.0.0.0:8000"
+#    command: >
+#      bash -c "./manage.py collectstatic --no-input &&
+#               ./manage.py migrate &&
+#               gunicorn -w 4 -b 0.0.0.0:8000 --chdir=/app student.wsgi:application"
+
+
+  celery:
+    image: student-backend_app
+    env_file: .env
+    #ports:
+    #  - 1900:5555
+    depends_on:
+      - app
+      - redis
+        #volumes:
+            #- /etc/localtime:/etc/localtime:ro
+    environment: # root kullanıcı olarak celery çalışırsa uyarı veriyor.
+      - C_FORCE_ROOT=true
+    command: >
+      bash -c "celery -A cetelem worker -l INFO &
+               celery -A cetelem beat -l INFO --scheduler=django_celery_beat.schedulers:DatabaseScheduler &
+               celery flower -A cetelem --broker=redis://redis:6379/ -l INFO --basic_auth=hhp:1 --url_prefix=flower"
+
+  nginx:
+    image: nginx:1.14-alpine
+    ports:
+      - 1899:80
+      - 80:80
+    volumes:
+      - ./nginx/student-web-dist:/usr/share/nginx/html
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - static-volume:/static/
+      - media-volume:/media/
+        #- /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - app
+
+  redis:
+    image: redis:4.0-alpine
+    volumes:
+      - redis_data:/data
+        #- /etc/localtime:/etc/localtime:ro
+
+volumes:
+  db-data:
+  redis_data:
+  static-volume:
+  media-volume:
+

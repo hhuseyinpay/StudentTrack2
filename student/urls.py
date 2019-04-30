@@ -1,57 +1,28 @@
-"""student URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/2.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.conf import settings
 from django.conf.urls import url
+from django.urls import path, include
+from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include
-from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from rest_framework.routers import SimpleRouter
 
-from course.api.views import CourseGroupViewset, CourseViewSet
-from daily_study.api.views import DailyStudyViewset, AdminDailyStudyViewset
-from account.api.views import UserViewSet, UserLoginAPIView, AdminUserViewSet, Kayit
-from syllabus.api.views import SyllabusViewSet, UserSyllabusViewSet, AdminUserSyllabusViewSet, ContentViewSet
-from location.api.views import ClassRoomRetrieveViewSet, AreaRetrieveViewSet, AdminClassroomViewSet, AdminAreaViewset, \
-    RegionRetrieveViewSet, AdminRegionViewset
+from .daily_study.views import DailyStudyViewset, AdminDailyStudyViewset, AdminDailyStudyViewsetV2
+from .syllabus.views import ContentViewSet, SyllabusViewSet, UserSyllabusViewSet, AdminUserSyllabusViewSet, \
+    UserSyllabusViewSetV2, AdminUserSyllabusViewSetV2
+from .course.views import CourseGroupViewset, CourseViewSet
+from .location.views import ClassRoomRetrieveViewSet, AreaRetrieveViewSet, RegionRetrieveViewSet, AdminClassroomViewSet, \
+    AdminAreaViewset, AdminRegionViewset
+from .account.views import  UserLoginAPIView, Kayit, UserViewSetV2, AdminUserViewSetV2
 
-schema_view = get_schema_view(
-    openapi.Info(
-        title="Snippets API",
-        default_version='v1',
-        description="Test description",
-        terms_of_service="https://www.google.com/policies/terms/",
-        contact=openapi.Contact(email="contact@snippets.local"),
-        license=openapi.License(name="BSD License"),
-    ),
-    validators=['flex', 'ssv'],
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
 admin_router = SimpleRouter()
 user_router = SimpleRouter()
 
 ###
 # account app
 ###
-user_router.register('user', UserViewSet, 'user-viewset')
 
-admin_router.register('user', AdminUserViewSet, 'adminuser-viewset')
 
 ###
 # location app
@@ -84,21 +55,54 @@ admin_router.register('user-syllabus', AdminUserSyllabusViewSet, 'adminusersylla
 user_router.register('daily-study', DailyStudyViewset, 'dailystudy-viewset')
 
 admin_router.register('daily-study', AdminDailyStudyViewset, 'admindailystudy-viewset')
+########################
+
+###
+# V2
+###
+user_routerV2 = SimpleRouter()
+admin_routerV2 = SimpleRouter()
+user_routerV2.register('user', UserViewSetV2, 'user-viewset-V2')
+admin_routerV2.register('user', AdminUserViewSetV2, 'adminuser-viewset-V2')
+
+user_routerV2.register('user-syllabus', UserSyllabusViewSetV2, 'user-syllabus-viewset-V2')
+admin_routerV2.register('user-syllabus', AdminUserSyllabusViewSetV2,'adminusersyllabus-viewset-V2' )
+
+admin_routerV2.register('daily-study', AdminDailyStudyViewsetV2, 'admindailystudy-viewset-V2')
+########################
+###
+# report
+###
 
 urlpatterns = [
-    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+# name space eklenebilmesi için lego'ya bak. api appi oluşturmuş içine v1 dosyasını koymuş oradan include ediyor..
 
     path('admin/', admin.site.urls),
 
+    path('api/v2/', include(user_routerV2.urls)),
+    path('api/v2/admin/', include(admin_routerV2.urls)),
+
     path('api/', include(user_router.urls)),
     path('api/admin/', include(admin_router.urls)),
+
     path('api/login', UserLoginAPIView.as_view(), name='api-login'),
     path('api/kayit', Kayit.as_view())
-    # path('reports/', include('reports.urls')),
-    # path('api/reports/', include('reports.api.urls'))
 ]
 
-if "silk" in settings.INSTALLED_APPS:
-    urlpatterns += [url(r'^silk/', include('silk.urls', namespace='silk'))]
+urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Snippets API",
+        default_version='v1',
+        description="Test description",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="contact@snippets.local"),
+        license=openapi.License(name="BSD License"),
+    ),
+    # validators=['flex', 'ssv'],
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
+
+urlpatterns += (url(r'^api/swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),)

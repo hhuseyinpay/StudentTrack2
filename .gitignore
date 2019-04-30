@@ -1,7 +1,6 @@
-# Created by .ignore support plugin (hsz.mobi)
-### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
+*.py[cod]
 *$py.class
 
 # C extensions
@@ -46,7 +45,6 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
-.pytest_cache/
 
 # Translations
 *.mo
@@ -54,7 +52,9 @@ coverage.xml
 
 # Django stuff:
 *.log
-db.sqlite3
+.static_storage/
+.media/
+local_settings.py
 
 # Flask stuff:
 instance/
@@ -82,7 +82,6 @@ celerybeat-schedule
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -100,16 +99,12 @@ venv.bak/
 # mkdocs documentation
 /site
 
+# django staticfiles
+/static
+
 # mypy
 .mypy_cache/
 
-/manage commands.txt
-/student/settings/__init__.py
+.idea/
+.vscode/
 
-/media/reports/template/daily_study_mountly_lise.xlsx
-/media/reports/template/daily_study_mountly_ortaokul.xlsx
-/media/reports/template/daily_study_mountly_universite.xlsx
-/media/reports/excel/daily_study/uni_test.xlsx
-
-/.idea/
-/student/settings/debug_local.py
