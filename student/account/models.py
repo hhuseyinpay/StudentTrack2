@@ -20,9 +20,8 @@ class User(StudentBaseModel, AbstractUser):
 
     USER_TYPE_CHOICES = (
         (ADMIN, 'Admin'),
-        (EXECUTIVE, 'Müdür'),
-        (TEACHER, 'Öğretmen'),
-        (STUDENT, 'Öğrenci')
+        (TEACHER, 'Teacher'),
+        (STUDENT, 'Student')
     )
     user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, null=True, blank=True)
     # phone_regex = RegexValidator(regex=r'^(05)[0-9][0-9]([0-9]){7}$',
