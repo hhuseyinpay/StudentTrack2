@@ -14,7 +14,7 @@ from .syllabus.views import ContentViewSet, SyllabusViewSet, UserSyllabusViewSet
 from .course.views import CourseGroupViewset, CourseViewSet
 from .location.views import ClassRoomRetrieveViewSet, AreaRetrieveViewSet, RegionRetrieveViewSet, AdminClassroomViewSet, \
     AdminAreaViewset, AdminRegionViewset
-from .account.views import  UserLoginAPIView, Kayit, UserViewSetV2, AdminUserViewSetV2
+from .account.views import UserViewSet, AdminUserViewSet, UserLoginAPIView, Kayit, UserViewSetV2, AdminUserViewSetV2
 
 admin_router = SimpleRouter()
 user_router = SimpleRouter()
@@ -22,7 +22,9 @@ user_router = SimpleRouter()
 ###
 # account app
 ###
+user_router.register('user', UserViewSet, 'user-viewset')
 
+admin_router.register('user', AdminUserViewSet, 'adminuser-viewset')
 
 ###
 # location app
