@@ -68,8 +68,8 @@ class DailyStudyReport(ViewSet):
             toplamlar = []
             for student in students:
                 student_studies = {
-                    'İsim Soyisim': str(student.first_name) + ' ' + str(student.last_name),
-                    'Medrese': str(student.classroom.name)
+                    'Name': str(student.first_name) + ' ' + str(student.last_name),
+                    'Classroom': str(student.classroom.name)
                 }
 
                 ds = student.dailystudy_set.filter(created_day__gte=begining, created_day__lte=end)
