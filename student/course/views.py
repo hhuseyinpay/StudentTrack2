@@ -35,7 +35,7 @@ class CourseGroupViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, views
         if user.has_group():
             qs = user.course_group.courses.all()
         else:
-            body = {"detail": "Çetele grubu bulunamadı."}
+            body = {"detail": "Course group not found."}
             return Response(data=body, status=status.HTTP_404_NOT_FOUND)
 
         body = CourseModelSerializer(qs, many=True).data
