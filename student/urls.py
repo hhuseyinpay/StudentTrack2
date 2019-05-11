@@ -8,7 +8,7 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from rest_framework.routers import SimpleRouter
 
-from .report.views import DailyStudyReport, Dashboard
+from .report.views import DailyStudyReport
 from .daily_study.views import DailyStudyViewset, AdminDailyStudyViewset
 from .syllabus.views import ContentViewSet, SyllabusViewSet, UserSyllabusViewSet, AdminUserSyllabusViewSet
 from .course.views import CourseGroupViewset, CourseViewSet
@@ -64,7 +64,6 @@ admin_router.register('daily-study', AdminDailyStudyViewset, 'admindailystudy-vi
 
 report_router = SimpleRouter()
 report_router.register('daily-study', DailyStudyReport, 'report-dailystudy')
-report_router.register('dashboard', Dashboard, 'report-dashboard')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
