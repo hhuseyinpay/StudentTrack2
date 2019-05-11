@@ -45,7 +45,6 @@ class DailyStudyReport(ViewSet):
         end = request.query_params.get('end', None)
         is_validated = request.query_params.get('is_validated', None)
 
-
         if group is None or begining is None or end is None or is_validated is None:
             return Response('query paramtrelerden biri eksik.', status=status.HTTP_400_BAD_REQUEST)
 
@@ -54,11 +53,11 @@ class DailyStudyReport(ViewSet):
         region = 1
         area = request.query_params.get('area', None)
         classroom = request.query_params.get('classroom', None)
-        if staff.is_teacher() and classroom is None:
-            return Response('Medrese seçilmedi?', status=status.HTTP_400_BAD_REQUEST)
+        # if staff.is_teacher() and classroom is None:
+        #    return Response('Medrese seçilmedi?', status=status.HTTP_400_BAD_REQUEST)
         try:
-            if not Region.objects.filter(admins=staff, id=region).exists():
-                return Response("region admini değilsin!? ", status=status.HTTP_403_FORBIDDEN)
+            # if not Region.objects.filter(admins=staff, id=region).exists():
+            #    return Response("region admini değilsin!? ", status=status.HTTP_403_FORBIDDEN)
             group = CourseGroups.objects.get(id=group)
             students = User.objects.filter(classroom__area__region=region, course_group=group, user_type=User.STUDENT) \
                 .prefetch_related('dailystudy_set')
