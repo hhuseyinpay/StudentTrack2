@@ -59,7 +59,7 @@ class DailyStudyReport(ViewSet):
             # if not Region.objects.filter(admins=staff, id=region).exists():
             #    return Response("region admini değilsin!? ", status=status.HTTP_403_FORBIDDEN)
             group = CourseGroups.objects.get(id=group)
-            students = User.objects.filter(classroom__area__region=region, course_group=group, user_type=User.STUDENT) \
+            students = User.objects.filter(course_group=group, user_type=User.STUDENT) \
                 .prefetch_related('dailystudy_set')
 
             # for student in students:
