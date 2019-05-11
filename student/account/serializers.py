@@ -81,7 +81,7 @@ class UserModelSerializerV2(serializers.ModelSerializer):
     username = serializers.CharField(
         min_length=3, max_length=30, required=True,
         validators=[
-            UniqueValidator(queryset=User.objects.all(), message='Bu kullanıcı adını başka kardeş kullanıyor mubarek.')
+            UniqueValidator(queryset=User.objects.all(), message='This username already in use')
         ])
     phone_number = serializers.CharField(min_length=10, max_length=11, required=False)
     course_group = CourseGroupListSerializer(read_only=True)
