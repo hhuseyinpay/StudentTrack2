@@ -74,3 +74,23 @@ class AdminChangeClassRoomSerializer(serializers.Serializer):
 class AdminChangeAreaSerializer(serializers.Serializer):
     area = serializers.PrimaryKeyRelatedField(required=False, queryset=ClassRoom.objects.all())
 
+
+######
+
+class UserModelSerializerV2(serializers.ModelSerializer):
+    username = serializers.CharField(
+        min_length=3, max_length=30, required=True,
+        validators=[
+            UniqueValidator(queryset=User.objects.all(), message='Bu kullanıcı adını başka kardeş kullanıyor mubarek.')
+        ])
+    phone_number = serializers.CharField(min_length=10, max_length=11, required=False)
+    course_group = CourseGroupListSerializer(read_only=True)
+    classroom = ClassRoomListSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'first_name', 'last_name', 'phone_number',
+                  'user_type', 'classroom', 'course_group', 'joined_date')
+        extra_kwargs = {
+            'user_type': {'read_only': True}, 'joined_date': {'read_only': True}
+        }
