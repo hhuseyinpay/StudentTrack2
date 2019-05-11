@@ -38,7 +38,7 @@ class UserReport(ViewSet):
 
 
 class DailyStudyReport(ViewSet):
-    @action(detail=False, permission_classes=[IsAuthenticated, IsAdmin])
+    @action(detail=False, permission_classes=[IsAuthenticated, IsStaff])
     def admin(self, request):
         group = request.query_params.get('group', None)
         begining = request.query_params.get('begining', None)
@@ -51,7 +51,7 @@ class DailyStudyReport(ViewSet):
 
         staff = request.user
 
-        region = request.query_params.get('region', None)
+        region = 1
         area = request.query_params.get('area', None)
         classroom = request.query_params.get('classroom', None)
         if staff.is_teacher() and classroom is None:
