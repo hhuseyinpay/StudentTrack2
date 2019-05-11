@@ -34,6 +34,7 @@ class Common(Configuration):
         'student.location',
         'student.syllabus',
         'student.daily_study',
+        'student.report',
         'student.utils',
     )
 

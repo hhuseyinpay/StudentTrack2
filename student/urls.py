@@ -8,6 +8,7 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from rest_framework.routers import SimpleRouter
 
+from .report.views import DailyStudyReport, Dashboard
 from .daily_study.views import DailyStudyViewset, AdminDailyStudyViewset, AdminDailyStudyViewsetV2
 from .syllabus.views import ContentViewSet, SyllabusViewSet, UserSyllabusViewSet, AdminUserSyllabusViewSet, \
     UserSyllabusViewSetV2, AdminUserSyllabusViewSetV2
@@ -68,7 +69,7 @@ user_routerV2.register('user', UserViewSetV2, 'user-viewset-V2')
 admin_routerV2.register('user', AdminUserViewSetV2, 'adminuser-viewset-V2')
 
 user_routerV2.register('user-syllabus', UserSyllabusViewSetV2, 'user-syllabus-viewset-V2')
-admin_routerV2.register('user-syllabus', AdminUserSyllabusViewSetV2,'adminusersyllabus-viewset-V2' )
+admin_routerV2.register('user-syllabus', AdminUserSyllabusViewSetV2, 'adminusersyllabus-viewset-V2')
 
 admin_routerV2.register('daily-study', AdminDailyStudyViewsetV2, 'admindailystudy-viewset-V2')
 ########################
@@ -76,9 +77,11 @@ admin_routerV2.register('daily-study', AdminDailyStudyViewsetV2, 'admindailystud
 # report
 ###
 
-urlpatterns = [
-# name space eklenebilmesi için lego'ya bak. api appi oluşturmuş içine v1 dosyasını koymuş oradan include ediyor..
+report_router = SimpleRouter()
+report_router.register('daily-study', DailyStudyReport, 'report-dailystudy')
+report_router.register('dashboard', Dashboard, 'report-dashboard')
 
+urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('api/v2/', include(user_routerV2.urls)),
@@ -86,6 +89,7 @@ urlpatterns = [
 
     path('api/', include(user_router.urls)),
     path('api/admin/', include(admin_router.urls)),
+    path('api/report/', include(report_router.urls)),
 
     path('api/login', UserLoginAPIView.as_view(), name='api-login'),
     path('api/kayit', Kayit.as_view())
