@@ -60,18 +60,3 @@ class DailyStudyListSerializer(serializers.ModelSerializer):
 
 class AdminDailyStudyModelSerializer(DailyStudyModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
-
-
-class AdminDailyStudyListSerializerV2(serializers.ModelSerializer):
-    user_full_name = serializers.SerializerMethodField(read_only=True)
-    classroom = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = DailyStudy
-        fields = '__all__'
-
-    def get_user_full_name(self, obj):
-        return obj.user.first_name + " " + obj.user.last_name
-
-    def get_classroom(self, obj):
-        return str(obj.user.classroom)

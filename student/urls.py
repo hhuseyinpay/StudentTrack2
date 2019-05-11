@@ -9,13 +9,12 @@ from rest_framework import permissions
 from rest_framework.routers import SimpleRouter
 
 from .report.views import DailyStudyReport, Dashboard
-from .daily_study.views import DailyStudyViewset, AdminDailyStudyViewset, AdminDailyStudyViewsetV2
-from .syllabus.views import ContentViewSet, SyllabusViewSet, UserSyllabusViewSet, AdminUserSyllabusViewSet, \
-    UserSyllabusViewSetV2, AdminUserSyllabusViewSetV2
+from .daily_study.views import DailyStudyViewset, AdminDailyStudyViewset
+from .syllabus.views import ContentViewSet, SyllabusViewSet, UserSyllabusViewSet, AdminUserSyllabusViewSet
 from .course.views import CourseGroupViewset, CourseViewSet
 from .location.views import ClassRoomRetrieveViewSet, AreaRetrieveViewSet, RegionRetrieveViewSet, AdminClassroomViewSet, \
     AdminAreaViewset, AdminRegionViewset
-from .account.views import UserViewSet, AdminUserViewSet, UserLoginAPIView, Kayit, UserViewSetV2, AdminUserViewSetV2
+from .account.views import UserViewSet, AdminUserViewSet, UserLoginAPIView, Kayit
 
 admin_router = SimpleRouter()
 user_router = SimpleRouter()
@@ -58,21 +57,7 @@ admin_router.register('user-syllabus', AdminUserSyllabusViewSet, 'adminusersylla
 user_router.register('daily-study', DailyStudyViewset, 'dailystudy-viewset')
 
 admin_router.register('daily-study', AdminDailyStudyViewset, 'admindailystudy-viewset')
-########################
 
-###
-# V2
-###
-user_routerV2 = SimpleRouter()
-admin_routerV2 = SimpleRouter()
-user_routerV2.register('user', UserViewSetV2, 'user-viewset-V2')
-admin_routerV2.register('user', AdminUserViewSetV2, 'adminuser-viewset-V2')
-
-user_routerV2.register('user-syllabus', UserSyllabusViewSetV2, 'user-syllabus-viewset-V2')
-admin_routerV2.register('user-syllabus', AdminUserSyllabusViewSetV2, 'adminusersyllabus-viewset-V2')
-
-admin_routerV2.register('daily-study', AdminDailyStudyViewsetV2, 'admindailystudy-viewset-V2')
-########################
 ###
 # report
 ###
@@ -83,9 +68,6 @@ report_router.register('dashboard', Dashboard, 'report-dashboard')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
-    path('api/v2/', include(user_routerV2.urls)),
-    path('api/v2/admin/', include(admin_routerV2.urls)),
 
     path('api/', include(user_router.urls)),
     path('api/admin/', include(admin_router.urls)),

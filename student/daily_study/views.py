@@ -16,8 +16,7 @@ from student.account.permissions import IsStaff
 from .filters import DailyStudyCreatedDayFilter
 from .models import DailyStudy, Study
 from .permissions import IsDailyStudyOwner, CanEditDailyStudy
-from .serializers import DailyStudyModelSerializer, DailyStudyListSerializer, AdminDailyStudyModelSerializer, \
-    AdminDailyStudyListSerializerV2
+from .serializers import DailyStudyModelSerializer, DailyStudyListSerializer, AdminDailyStudyModelSerializer
 
 
 class DailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, GenericViewSet):
@@ -39,7 +38,7 @@ class DailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixi
     def today(self, request):
         user = request.user
         if not user.has_group():
-            body = {'detail': 'Herhangi bir çetele grubuna dahil değilsiniz!'}
+            body = {'detail': 'There is no course group'}
             return Response(body, status=status.HTTP_400_BAD_REQUEST)
         try:
             ds = DailyStudy.objects.get(user=user, created_day=now().date())
@@ -67,7 +66,7 @@ class DailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixi
             date = now()
         user = request.user
         if not user.has_group():
-            body = {'detail': 'Herhangi bir çetele grubuna dahil değilsiniz!'}
+            body = {'detail': 'There is no course group'}
             return Response(body, status=status.HTTP_400_BAD_REQUEST)
         try:
             ds = DailyStudy.objects.get(user=user, created_day=date.date())
@@ -100,7 +99,7 @@ class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
     def today(self, request, user_id=None):
         user = get_object_or_404(User, pk=user_id)
         if not user.has_group():
-            body = {'detail': 'Herhangi bir çetele grubuna dahil değil!'}
+            body = {'detail': 'There is no course group!'}
             return Response(body, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -144,7 +143,7 @@ class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
         is_validated = request.query_params.get('is_validated', None)
 
         if not user or not begining or not end or not is_validated:
-            body = {'detail': 'Onay durumu, talebe, başlangıç tarihi veya bitiş tarihi seçilmedi !!'}
+            body = {'detail': 'is_validated, student, begining date pr end date not valid !!'}
             return Response(body, status=status.HTTP_400_BAD_REQUEST)
 
         body = {
@@ -171,80 +170,3 @@ class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
 
         return Response(body)
 
-
-class AdminDailyStudyViewsetV2(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, GenericViewSet):
-    serializer_class = AdminDailyStudyModelSerializer
-    permission_classes = (IsAuthenticated, CanEditDailyStudy)
-    filter_backends = (OrderingFilter, DjangoFilterBackend)
-    filter_class = DailyStudyCreatedDayFilter
-    queryset =  DailyStudy.objects.all()
-    """
-    Eğer bu filtreyi yaparsam student olmayanlar kendi çetelelerine müdaha edemiyor çünkü classroomları yok ?? 
-    def get_queryset(self):
-        staff = self.request.user
-        if staff.is_teacher():
-            return DailyStudy.objects.filter(user__classroom__teachers=staff)
-        elif staff.is_executive():
-            return DailyStudy.objects.filter(user__classroom__area__executives=staff)
-        else:
-            return DailyStudy.objects.filter(user__classroom__area__region__admins=staff)
-    """
-    def get_serializer_class(self):
-        if self.action == 'list':
-            return AdminDailyStudyListSerializerV2
-        else:
-            return AdminDailyStudyModelSerializer
-
-    @action(detail=False, permission_classes=[IsAuthenticated, IsStaff])
-    def date(self, request):
-        """
-        :param ?date=2019-03-27&student={id} şeklinde parametre verilecek. girilmezse default döner
-        :return:  default return today.
-        """
-
-        student_id = request.query_params.get('student', None)
-        student = get_object_or_404(User, id=student_id)
-
-        date = request.query_params.get('date', '')
-        try:
-            date = datetime.strptime(date, '%Y-%m-%d')
-        except ValueError:
-            date = now()
-
-        if not student.has_group():
-            body = {'detail': 'Bu talebe bir çetele grubuna dahil değil!'}
-            return Response(body, status=status.HTTP_404_NOT_FOUND)
-        try:
-            ds = DailyStudy.objects.get(user=student, created_day=date.date())
-        except DailyStudy.DoesNotExist:
-            ds = DailyStudy.objects.create(user=student, created_day=date.date())
-
-            studies = []
-            for course in student.course_group.courses.all():
-                studies.append(Study(daily_study=ds, course=course, begining=0, end=0, amount=0))
-            Study.objects.bulk_create(studies)
-
-        body = self.get_serializer(ds).data
-        return Response(body)
-
-    @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, IsStaff])
-    def validate(self, request, pk=None):
-        ds = self.get_object()
-        if not ds.is_validated:
-            ds.is_validated = True
-            ds.validator_user = request.user
-            ds.validate_time = now()
-            ds.save()
-
-        body = self.get_serializer(ds).data
-        return Response(body)
-
-    @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, IsStaff])
-    def invalidate(self, request, pk=None):
-        ds = self.get_object()
-        if ds.is_validated:
-            ds.is_validated = False
-            ds.save()
-
-        body = self.get_serializer(ds).data
-        return Response(body)
