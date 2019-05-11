@@ -10,10 +10,10 @@ from rest_framework.routers import SimpleRouter
 
 from .report.views import DailyStudyReport
 from .daily_study.views import DailyStudyViewset, AdminDailyStudyViewset
-from .syllabus.views import ContentViewSet, SyllabusViewSet, UserSyllabusViewSet, AdminUserSyllabusViewSet
+from .syllabus.views import ContentViewSet, SyllabusViewSet, AdminUserSyllabusViewSet
 from .course.views import CourseGroupViewset, CourseViewSet
-from .location.views import ClassRoomRetrieveViewSet, AreaRetrieveViewSet, RegionRetrieveViewSet, AdminClassroomViewSet, \
-    AdminAreaViewset, AdminRegionViewset
+from .location.views import AdminClassroomViewSet
+
 from .account.views import UserViewSet, AdminUserViewSet, UserLoginAPIView, Kayit
 
 admin_router = SimpleRouter()
@@ -29,13 +29,8 @@ admin_router.register('user', AdminUserViewSet, 'adminuser-viewset')
 ###
 # location app
 ###
-user_router.register('classroom', ClassRoomRetrieveViewSet, 'classroomretrieve-viewset')
-user_router.register('area', AreaRetrieveViewSet, 'arearetrieve-viewset')
-user_router.register('region', RegionRetrieveViewSet, 'regionretrieve-viewset')
-
 admin_router.register('classroom', AdminClassroomViewSet, 'adminclassroom-viewset')
-admin_router.register('area', AdminAreaViewset, 'adminarea-viewset')
-admin_router.register('region', AdminRegionViewset, 'adminregion-viewset')
+
 ###
 # course app
 ###
@@ -47,7 +42,6 @@ user_router.register('course', CourseViewSet, 'course-viewset')
 ###
 user_router.register('content', ContentViewSet, 'content-viewset')
 user_router.register('syllabus', SyllabusViewSet, 'syllabus-viewset')
-user_router.register('user-syllabus', UserSyllabusViewSet, 'usersyllabus-viewset')
 
 admin_router.register('user-syllabus', AdminUserSyllabusViewSet, 'adminusersyllabus-viewset')
 

@@ -3,9 +3,6 @@ from rest_framework.validators import UniqueValidator
 
 from student.account.models import User
 from student.course.models import CourseGroups
-from student.location.models import ClassRoom, Area
-from student.course.serializers import CourseGroupListSerializer
-from student.location.serializers import ClassRoomListSerializer
 
 
 class UserListSerializer(serializers.ModelSerializer):
@@ -62,35 +59,3 @@ class AdminUserModelSerializer(UserModelSerializer):
                         'user_type': {'read_only': True},
                         'classroom': {'read_only': True}}
 
-
-class AdminMakeStudentSeriazlier(serializers.Serializer):
-    classroom = serializers.PrimaryKeyRelatedField(queryset=ClassRoom.objects.all())
-
-
-class AdminChangeClassRoomSerializer(serializers.Serializer):
-    classroom = serializers.PrimaryKeyRelatedField(queryset=ClassRoom.objects.all())
-
-
-class AdminChangeAreaSerializer(serializers.Serializer):
-    area = serializers.PrimaryKeyRelatedField(required=False, queryset=ClassRoom.objects.all())
-
-
-######
-
-class UserModelSerializerV2(serializers.ModelSerializer):
-    username = serializers.CharField(
-        min_length=3, max_length=30, required=True,
-        validators=[
-            UniqueValidator(queryset=User.objects.all(), message='This username already in use')
-        ])
-    phone_number = serializers.CharField(min_length=10, max_length=11, required=False)
-    course_group = CourseGroupListSerializer(read_only=True)
-    classroom = ClassRoomListSerializer(read_only=True)
-
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'phone_number',
-                  'user_type', 'classroom', 'course_group', 'joined_date')
-        extra_kwargs = {
-            'user_type': {'read_only': True}, 'joined_date': {'read_only': True}
-        }

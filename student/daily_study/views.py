@@ -1,6 +1,3 @@
-from datetime import datetime
-
-from django.db.models import Sum
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from django_filters.rest_framework import DjangoFilterBackend
@@ -19,7 +16,7 @@ from .permissions import IsDailyStudyOwner, CanEditDailyStudy
 from .serializers import DailyStudyModelSerializer, DailyStudyListSerializer, AdminDailyStudyModelSerializer
 
 
-class DailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, GenericViewSet):
+class DailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, GenericViewSet):
     serializer_class = DailyStudyModelSerializer
     permission_classes = (IsAuthenticated, IsDailyStudyOwner)
     filter_backends = (OrderingFilter, DjangoFilterBackend)
@@ -44,34 +41,6 @@ class DailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixi
             ds = DailyStudy.objects.get(user=user, created_day=now().date())
         except DailyStudy.DoesNotExist:
             ds = DailyStudy.objects.create(user=user, created_day=now().date())
-
-            studies = []
-            for course in user.course_group.courses.all():
-                studies.append(Study(daily_study=ds, course=course, begining=0, end=0, amount=0))
-            Study.objects.bulk_create(studies)
-
-        body = self.get_serializer(ds).data
-        return Response(body, status=status.HTTP_200_OK)
-
-    @action(detail=False, permission_classes=[IsAuthenticated])
-    def date(self, request):
-        """
-        :param ?date=2019-03-27 şeklinde parametre verilecek. girilmezse default döner
-        :return:  default return today.
-        """
-        date = request.query_params.get('date', '')
-        try:
-            date = datetime.strptime(date, '%Y-%m-%d')
-        except ValueError:
-            date = now()
-        user = request.user
-        if not user.has_group():
-            body = {'detail': 'There is no course group'}
-            return Response(body, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            ds = DailyStudy.objects.get(user=user, created_day=date.date())
-        except DailyStudy.DoesNotExist:
-            ds = DailyStudy.objects.create(user=user, created_day=date.date())
 
             studies = []
             for course in user.course_group.courses.all():
@@ -134,39 +103,3 @@ class AdminDailyStudyViewset(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
 
         body = self.get_serializer(ds).data
         return Response(body, status=status.HTTP_200_OK)
-
-    @action(detail=False, permission_classes=[IsAuthenticated, IsStaff])
-    def total(self, request, *args, **kwargs):
-        user = request.query_params.get('user', None)
-        begining = request.query_params.get('begining', None)
-        end = request.query_params.get('end', None)
-        is_validated = request.query_params.get('is_validated', None)
-
-        if not user or not begining or not end or not is_validated:
-            body = {'detail': 'is_validated, student, begining date pr end date not valid !!'}
-            return Response(body, status=status.HTTP_400_BAD_REQUEST)
-
-        body = {
-            "studies": [
-            ]
-        }
-
-        queryset = self.filter_queryset(self.get_queryset())
-        studies = Study.objects.filter(daily_study__in=queryset)
-        user = get_object_or_404(User, pk=user)
-
-        for course in user.course_group.courses.values_list('id', flat=True):
-            b = {
-                "course": course,
-                "begining": 0,
-                "end": 0,
-                "amount": studies.filter(course=course).aggregate(total=Sum('amount'))['total'] or 0
-            }
-
-            body["studies"].append(b)
-        # hangi sorguların yapıldığını kontrol etmek için:
-        # from django.db import connection
-        # print(connection.queries)
-
-        return Response(body)
-
