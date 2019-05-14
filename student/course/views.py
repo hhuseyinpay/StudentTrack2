@@ -45,3 +45,4 @@ class CourseGroupViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, views
 class CourseViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = CourseModelSerializer
     queryset = Course.objects.all()
+
